@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OtonomiQ Hotel OS — Next-Gen Hospitality Intelligence</title>
+    <title>OtonomiQ Hotel OS — Interactive Real-Time Product Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -11,20 +11,21 @@
             theme: {
                 extend: {
                     colors: {
-                        obsidian: '#030407',
-                        charcoal: '#0a0d14',
+                        obsidian: '#020305',
+                        charcoal: '#090c13',
                         laser: '#00f2fe',
                         laserGlow: 'rgba(0, 242, 254, 0.25)',
-                        cardBg: 'rgba(15, 20, 32, 0.55)'
+                        panelBg: 'rgba(13, 17, 28, 0.65)'
                     },
                     fontFamily: {
                         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+                        mono: ['Fira Code', 'JetBrains Mono', 'monospace']
                     }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -33,7 +34,7 @@
 
     <style>
         body {
-            background-color: #030407;
+            background-color: #020305;
             color: #f3f4f6;
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
@@ -43,156 +44,167 @@
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
             transform-style: preserve-3d;
         }
         .glass-card:hover {
             border-color: rgba(0, 242, 254, 0.4);
             box-shadow: 0 0 35px rgba(0, 242, 254, 0.2);
         }
-        .laser-text {
-            color: #00f2fe;
-            text-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
-        }
         .bg-grid {
-            background-size: 50px 50px;
+            background-size: 40px 40px;
             background-image: 
                 linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
         }
-        /* Custom Smooth Scrollbar */
+        .active-tab {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: #00f2fe;
+            color: #00f2fe;
+        }
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #030407; }
+        ::-webkit-scrollbar-track { background: #020305; }
         ::-webkit-scrollbar-thumb { background: #1a2234; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #00f2fe; }
     </style>
 </head>
 <body class="bg-obsidian text-gray-100 antialiased selection:bg-laser selection:text-black bg-grid">
 
-    <nav class="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/10 py-4 px-6 md:px-12 backdrop-blur-2xl">
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-card border-b border-white/10 py-3 md:py-4 px-4 md:px-12 backdrop-blur-2xl">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <a href="#" class="text-xl font-extrabold tracking-widest text-white flex items-center gap-2.5">
+            <a href="#" class="text-lg md:text-xl font-extrabold tracking-widest text-white flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-laser inline-block animate-pulse shadow-[0_0_12px_#00f2fe]"></span>
-                OTONOMIQ <span class="text-[10px] font-mono text-laser border border-laser/40 px-2 py-0.5 rounded-full tracking-wider bg-laser/10">HOTEL OS</span>
+                OTONOMIQ <span class="text-[10px] font-mono text-laser border border-laser/40 px-2 py-0.5 rounded-full tracking-wider bg-laser/10 hidden sm:inline-block">HOTEL OS</span>
             </a>
-            <div class="hidden md:flex items-center space-x-8 text-xs font-semibold uppercase tracking-widest text-gray-400">
+            <div class="hidden lg:flex items-center space-x-8 text-xs font-semibold uppercase tracking-widest text-gray-400">
                 <a href="#hero" class="hover:text-laser transition-colors flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Platform</a>
+                <a href="#live-simulator" class="hover:text-laser transition-colors flex items-center gap-1.5 text-laser"><i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> Live Demo Layer</a>
                 <a href="#modules" class="hover:text-laser transition-colors flex items-center gap-1.5"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Modules</a>
-                <a href="#operating-loop" class="hover:text-laser transition-colors flex items-center gap-1.5"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Execution Engine</a>
-                <a href="#impact" class="hover:text-laser transition-colors flex items-center gap-1.5"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> ROI Calculator</a>
+                <a href="#operating-loop" class="hover:text-laser transition-colors flex items-center gap-1.5"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Engine</a>
+                <a href="#impact" class="hover:text-laser transition-colors flex items-center gap-1.5"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> ROI</a>
             </div>
             <div>
-                <a href="#book" class="text-xs font-bold uppercase tracking-widest bg-laser text-black hover:bg-white hover:shadow-[0_0_25px_rgba(0,242,254,0.8)] px-6 py-3 rounded-full transition-all duration-300 flex items-center gap-2">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Request Executive Demo
+                <a href="#book" class="text-[11px] md:text-xs font-bold uppercase tracking-widest bg-laser text-black hover:bg-white hover:shadow-[0_0_25px_rgba(0,242,254,0.8)] px-4 md:px-6 py-2.5 md:py-3 rounded-full transition-all duration-300 flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i> Request Demo
                 </a>
             </div>
         </div>
     </nav>
 
-    <section id="hero" class="relative min-h-[200vh] border-b border-white/5">
-        <div id="hero-sticky" class="sticky top-0 h-screen flex flex-col justify-center items-center pt-20 px-6 overflow-hidden">
+    <section id="hero" class="relative min-h-[180vh] sm:min-h-[220vh] border-b border-white/5">
+        <div id="hero-sticky" class="sticky top-0 h-screen flex flex-col justify-center items-center pt-16 md:pt-20 px-4 md:px-6 overflow-hidden">
             
-            <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-laser/10 rounded-full blur-[140px] pointer-events-none"></div>
+            <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[350px] sm:w-[600px] md:w-[800px] h-[350px] sm:h-[600px] md:h-[800px] bg-laser/10 rounded-full blur-[120px] md:blur-[160px] pointer-events-none"></div>
 
-            <div class="hero-float-card absolute top-28 left-[8%] hidden lg:flex items-center gap-3 p-4 glass-card rounded-2xl z-30" data-speed="0.2">
-                <div class="w-10 h-10 rounded-xl bg-laser/20 border border-laser/40 flex items-center justify-center text-laser">
-                    <i data-lucide="trending-up" class="w-5 h-5"></i>
+            <div class="hero-float-card absolute top-24 left-[5%] hidden lg:flex items-center gap-3 p-3.5 glass-card rounded-2xl z-30" data-speed="0.2">
+                <div class="w-9 h-9 rounded-xl bg-laser/20 border border-laser/40 flex items-center justify-center text-laser">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
                 </div>
                 <div>
-                    <div class="text-xs font-mono text-gray-400">RevPAR Impact</div>
-                    <div class="text-sm font-bold text-white">+18.4% Average</div>
+                    <div class="text-[10px] font-mono text-gray-400">RevPAR Impact</div>
+                    <div class="text-xs font-bold text-white">+18.4% Average</div>
                 </div>
             </div>
 
-            <div class="hero-float-card absolute bottom-28 right-[8%] hidden lg:flex items-center gap-3 p-4 glass-card rounded-2xl z-30" data-speed="0.4">
-                <div class="w-10 h-10 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400">
-                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <div class="hero-float-card absolute bottom-24 right-[5%] hidden lg:flex items-center gap-3 p-3.5 glass-card rounded-2xl z-30" data-speed="0.4">
+                <div class="w-9 h-9 rounded-xl bg-green-500/20 border border-green-500/40 flex items-center justify-center text-green-400">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
                 </div>
                 <div>
-                    <div class="text-xs font-mono text-gray-400">Response Speed</div>
-                    <div class="text-sm font-bold text-white">12 Sec Resolution</div>
+                    <div class="text-[10px] font-mono text-gray-400">Resolution Speed</div>
+                    <div class="text-xs font-bold text-white">12 Sec Automation</div>
                 </div>
             </div>
 
-            <div id="hero-text" class="max-w-4xl mx-auto z-20 text-center space-y-6">
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-laser/40 bg-laser/10 text-laser text-xs font-mono tracking-wider uppercase">
+            <div class="hero-float-card absolute top-1/3 right-[8%] hidden xl:flex items-center gap-3 p-3.5 glass-card rounded-2xl z-30" data-speed="0.3">
+                <div class="w-9 h-9 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <div class="text-[10px] font-mono text-gray-400">Audit Compliance</div>
+                    <div class="text-xs font-bold text-white">100% Immutable</div>
+                </div>
+            </div>
+
+            <div id="hero-text" class="max-w-4xl mx-auto z-20 text-center space-y-4 md:space-y-6">
+                <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-laser/40 bg-laser/10 text-laser text-[10px] sm:text-xs font-mono tracking-wider uppercase">
                     <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Enterprise Hotel OS for Leadership & Operations
                 </div>
-                <h1 class="text-4xl md:text-6xl lg:text-7xl font-light tracking-tight text-white leading-tight">
+                <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-white leading-tight">
                     Hotels have software.<br/>
                     <span class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-laser">Now they need connected execution.</span>
                 </h1>
-                <p class="text-sm md:text-lg text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
-                    OtonomiQ links your PMS, POS, messaging, and department teams into an intelligent operating layer — driving speed, efficiency, and revenue.
+                <p class="text-xs sm:text-sm md:text-base text-gray-400 font-light max-w-2xl mx-auto leading-relaxed px-2">
+                    OtonomiQ links PMS, POS, channels, and staff into a real-time command OS — turning operational friction into instant, orchestrated decisions.
                 </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                    <a href="#live-mission" class="w-full sm:w-auto px-8 py-4 rounded-full bg-laser text-black font-bold text-xs uppercase tracking-widest hover:shadow-[0_0_35px_rgba(0,242,254,0.8)] transition-all flex items-center justify-center gap-2">
-                        <i data-lucide="play" class="w-4 h-4 fill-current"></i> Launch Live Command Demo
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2">
+                    <a href="#live-simulator" class="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-laser text-black font-bold text-xs uppercase tracking-widest hover:shadow-[0_0_35px_rgba(0,242,254,0.8)] transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="play" class="w-4 h-4 fill-current"></i> Interactive Live Simulator
                     </a>
-                    <a href="#modules" class="w-full sm:w-auto px-8 py-4 rounded-full glass-card hover:bg-white/10 text-white font-semibold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                        <i data-lucide="grid" class="w-4 h-4"></i> Explore Modules
+                    <a href="#modules" class="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-full glass-card hover:bg-white/10 text-white font-semibold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="grid" class="w-4 h-4"></i> Explore Architecture
                     </a>
                 </div>
             </div>
 
-            <div id="hero-dashboard" class="w-full max-w-5xl mt-12 z-10 glass-card rounded-2xl p-6 border border-white/10 shadow-2xl transition-transform duration-75">
-                <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
-                    <div class="flex items-center gap-3">
+            <div id="hero-dashboard" class="w-full max-w-5xl mt-6 sm:mt-10 z-10 glass-card rounded-2xl p-4 sm:p-6 border border-white/10 shadow-2xl transition-transform duration-75">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3 sm:pb-4 mb-4 sm:mb-6">
+                    <div class="flex items-center gap-2 sm:gap-3">
                         <div class="flex gap-1.5">
-                            <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-                            <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
-                            <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                            <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 inline-block"></span>
+                            <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 inline-block"></span>
+                            <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 inline-block"></span>
                         </div>
-                        <span class="text-xs font-mono text-gray-400 flex items-center gap-1.5 border-l border-white/10 pl-3">
-                            <i data-lucide="cpu" class="w-3.5 h-3.5 text-laser"></i> OTONOMIQ_CORE_ORCHESTRATOR
+                        <span class="text-[10px] sm:text-xs font-mono text-gray-400 flex items-center gap-1.5 border-l border-white/10 pl-2 sm:pl-3">
+                            <i data-lucide="cpu" class="w-3.5 h-3.5 text-laser"></i> OTONOMIQ_LIVE_CORE
                         </span>
                     </div>
-                    <div class="text-xs font-mono text-laser flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-laser animate-ping"></span> Real-Time Hotel Sync
+                    <div class="text-[10px] sm:text-xs font-mono text-laser flex items-center gap-1.5 sm:gap-2">
+                        <span class="w-2 h-2 rounded-full bg-laser animate-ping"></span> Real-Time Orchestration
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
-                    <div class="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
-                        <span class="flex items-center gap-2"><i data-lucide="database" class="w-4 h-4 text-laser"></i> Opera PMS</span>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 text-[11px] sm:text-xs font-mono">
+                    <div class="p-2.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
+                        <span class="flex items-center gap-1.5 sm:gap-2"><i data-lucide="database" class="w-3.5 h-3.5 text-laser"></i> Opera PMS</span>
                         <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-400"></i>
                     </div>
-                    <div class="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
-                        <span class="flex items-center gap-2"><i data-lucide="utensils" class="w-4 h-4 text-laser"></i> POS Outlets</span>
+                    <div class="p-2.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
+                        <span class="flex items-center gap-1.5 sm:gap-2"><i data-lucide="utensils" class="w-3.5 h-3.5 text-laser"></i> POS Terminals</span>
                         <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-400"></i>
                     </div>
-                    <div class="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
-                        <span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-laser"></i> Guest Messaging</span>
+                    <div class="p-2.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
+                        <span class="flex items-center gap-1.5 sm:gap-2"><i data-lucide="message-square" class="w-3.5 h-3.5 text-laser"></i> Guest WhatsApp</span>
                         <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-400"></i>
                     </div>
-                    <div class="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
-                        <span class="flex items-center gap-2"><i data-lucide="dollar-sign" class="w-4 h-4 text-laser"></i> Revenue Engine</span>
+                    <div class="p-2.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
+                        <span class="flex items-center gap-1.5 sm:gap-2"><i data-lucide="line-chart" class="w-3.5 h-3.5 text-laser"></i> Dynamic Revenue</span>
                         <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-400"></i>
                     </div>
                 </div>
 
-                <div class="my-6 relative flex justify-center items-center">
+                <div class="my-4 sm:my-6 relative flex justify-center items-center">
                     <div class="w-full h-px bg-gradient-to-r from-transparent via-laser/50 to-transparent"></div>
-                    <div class="absolute bg-obsidian border border-laser text-laser px-6 py-2 rounded-full font-mono font-bold text-xs tracking-widest shadow-[0_0_20px_rgba(0,242,254,0.4)] flex items-center gap-2">
-                        <i data-lucide="zap" class="w-4 h-4 text-laser"></i> ACTIVE EXECUTION LAYER
+                    <div class="absolute bg-obsidian border border-laser text-laser px-4 sm:px-6 py-1 sm:py-1.5 rounded-full font-mono font-bold text-[10px] sm:text-xs tracking-widest shadow-[0_0_20px_rgba(0,242,254,0.4)] flex items-center gap-2">
+                        <i data-lucide="zap" class="w-3.5 h-3.5 text-laser animate-pulse"></i> ACTIVE EXECUTION ENGINE
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
-                    <div class="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
-                        <span class="flex items-center gap-2"><i data-lucide="truck" class="w-4 h-4 text-laser"></i> Procurement</span>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 text-[11px] sm:text-xs font-mono">
+                    <div class="p-2.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
+                        <span class="flex items-center gap-1.5 sm:gap-2"><i data-lucide="shopping-bag" class="w-3.5 h-3.5 text-laser"></i> Procurement</span>
                         <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-400"></i>
                     </div>
-                    <div class="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
-                        <span class="flex items-center gap-2"><i data-lucide="home" class="w-4 h-4 text-laser"></i> Housekeeping</span>
+                    <div class="p-2.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
+                        <span class="flex items-center gap-1.5 sm:gap-2"><i data-lucide="home" class="w-3.5 h-3.5 text-laser"></i> Housekeeping</span>
                         <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-400"></i>
                     </div>
-                    <div class="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
-                        <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-laser"></i> ERP Finance</span>
+                    <div class="p-2.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
+                        <span class="flex items-center gap-1.5 sm:gap-2"><i data-lucide="file-text" class="w-3.5 h-3.5 text-laser"></i> Finance ERP</span>
                         <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-400"></i>
                     </div>
-                    <div class="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
-                        <span class="flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4 text-laser"></i> Audit Control</span>
+                    <div class="p-2.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-gray-300">
+                        <span class="flex items-center gap-1.5 sm:gap-2"><i data-lucide="shield" class="w-3.5 h-3.5 text-laser"></i> Audit Trail</span>
                         <i data-lucide="check-circle" class="w-3.5 h-3.5 text-green-400"></i>
                     </div>
                 </div>
@@ -201,236 +213,284 @@
         </div>
     </section>
 
-    <section class="py-32 px-6 relative overflow-hidden border-t border-white/5">
-        <div class="max-w-6xl mx-auto space-y-16">
-            <div class="text-center space-y-4">
-                <p class="text-xs font-mono text-gray-400 uppercase tracking-widest flex items-center justify-center gap-2">
-                    <i data-lucide="alert-circle" class="w-4 h-4 text-red-400"></i> Operational Bottlenecks
+    <section id="live-simulator" class="py-24 md:py-32 px-4 md:px-6 bg-charcoal/50 border-t border-white/5 relative">
+        <div class="parallax-bg-icon absolute top-20 left-10 text-laser/5 pointer-events-none" data-parallax-speed="0.15">
+            <i data-lucide="cpu" class="w-48 h-48"></i>
+        </div>
+        <div class="parallax-bg-icon absolute bottom-20 right-10 text-white/5 pointer-events-none" data-parallax-speed="0.25">
+            <i data-lucide="network" class="w-64 h-64"></i>
+        </div>
+
+        <div class="max-w-7xl mx-auto space-y-8 md:space-y-12 relative z-10">
+            <div class="text-center space-y-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-laser/30 bg-laser/10 text-laser text-xs font-mono">
+                    <i data-lucide="terminal" class="w-3.5 h-3.5"></i> EXECUTIVE REAL-TIME DEMO LAYER
+                </div>
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-light text-white">Experience OtonomiQ in Action.</h2>
+                <p class="text-xs sm:text-sm text-gray-400 max-w-2xl mx-auto">
+                    Select a operational scenario below to demonstrate how OtonomiQ senses events, makes decisions, and coordinates workflows across systems in real time.
                 </p>
-                <h2 class="text-3xl md:text-5xl font-light text-white">Why software alone fails hotel operations.</h2>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="tilt-card glass-card p-8 rounded-2xl border-t-2 border-red-500/60 space-y-6" data-tilt data-tilt-max="12" data-tilt-speed="400">
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4 font-mono text-xs">
+                <button onclick="switchTab('procurement')" id="tab-procurement" class="tab-btn active-tab px-4 sm:px-6 py-3 rounded-xl glass-card border transition-all flex items-center gap-2">
+                    <i data-lucide="shopping-bag" class="w-4 h-4"></i> Procurement Automation
+                </button>
+                <button onclick="switchTab('guest')" id="tab-guest" class="tab-btn px-4 sm:px-6 py-3 rounded-xl glass-card border border-white/10 text-gray-400 hover:text-white transition-all flex items-center gap-2">
+                    <i data-lucide="concierge-bell" class="w-4 h-4"></i> VIP Guest Service
+                </button>
+                <button onclick="switchTab('revenue')" id="tab-revenue" class="tab-btn px-4 sm:px-6 py-3 rounded-xl glass-card border border-white/10 text-gray-400 hover:text-white transition-all flex items-center gap-2">
+                    <i data-lucide="line-chart" class="w-4 h-4"></i> Dynamic Yield Action
+                </button>
+            </div>
+
+            <div class="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-2xl bg-obsidian/80">
+                
+                <div class="bg-white/5 p-4 sm:p-5 border-b border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs font-mono">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 rounded-full bg-laser animate-ping"></span>
+                        <span class="text-white font-bold text-sm tracking-wide" id="sim-title">SCENARIO: AUTOMATED PROCUREMENT & VENDOR RFQ</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-gray-400">
+                        <span class="flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-laser"></i> Latency: 12ms</span>
+                        <span class="flex items-center gap-1.5 text-laser"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Human Guardrails Active</span>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-6 p-4 sm:p-6 md:p-8">
+                    
+                    <div class="lg:col-span-4 space-y-4">
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                            <span class="text-[10px] font-mono text-laser flex items-center gap-1.5">
+                                <i data-lucide="radio" class="w-3.5 h-3.5"></i> 1. SIGNAL SENSING LAYER
+                            </span>
+                            <div class="p-3 rounded-lg bg-black/60 border border-white/10 font-mono text-xs space-y-1" id="sim-signal-box">
+                                <div class="text-gray-400">Event: Stock Threshold Reached</div>
+                                <div class="text-laser font-bold">Item: Premium Espresso Beans (1.5 kg remaining)</div>
+                                <div class="text-gray-500 text-[10px]">Source: Outlet POS Inventory API</div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
+                            <span class="text-[10px] font-mono text-laser flex items-center gap-1.5">
+                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> 2. CONTEXT & KNOWLEDGE CHECK
+                            </span>
+                            <div class="text-xs font-mono text-gray-300 space-y-2" id="sim-context-box">
+                                <div class="flex items-center justify-between p-2 rounded bg-white/5">
+                                    <span>Approved Vendors</span>
+                                    <span class="text-green-400">3 Suppliers</span>
+                                </div>
+                                <div class="flex items-center justify-between p-2 rounded bg-white/5">
+                                    <span>Budget Limit</span>
+                                    <span class="text-green-400">$1,500 Available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-8 space-y-6">
+                        
+                        <div class="p-5 sm:p-6 rounded-xl bg-laser/10 border border-laser/40 space-y-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <span class="text-xs font-mono text-laser font-bold flex items-center gap-2">
+                                    <i data-lucide="sparkles" class="w-4 h-4"></i> 3. DECISION ENGINE RECOMMENDATION
+                                </span>
+                                <span class="text-[10px] font-mono bg-laser/20 text-laser px-2.5 py-1 rounded border border-laser/40 w-fit">PROPOSAL READY FOR APPROVAL</span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-gray-200 font-mono leading-relaxed" id="sim-recommendation">
+                                Generate Purchase Order #PO-8820 for 50kg Espresso Beans from Supplier B ($12.50/kg — Lowest Quote & Fast 24h Delivery).
+                            </p>
+
+                            <div class="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-laser/20">
+                                <button id="sim-exec-btn" onclick="triggerSimulationExecution()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-laser text-black font-mono text-xs font-bold hover:shadow-[0_0_30px_rgba(0,242,254,0.8)] transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="play-circle" class="w-4 h-4"></i> Execute Action in Real-Time
+                                </button>
+                                <span class="text-[10px] font-mono text-gray-400 flex items-center gap-1">
+                                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-laser"></i> Approver: F&B Director
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 sm:p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3 font-mono text-xs">
+                            <span class="text-[10px] text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                                <i data-lucide="activity" class="w-3.5 h-3.5 text-laser"></i> 4. SYSTEM EXECUTION LOGS
+                            </span>
+                            <div class="space-y-2 text-gray-400 max-h-40 overflow-y-auto" id="sim-logs font-mono">
+                                <div class="flex items-center gap-2 text-gray-500"><i data-lucide="check" class="w-3 h-3 text-laser"></i> [14:02:10] Signal captured from POS Inventory Node</div>
+                                <div class="flex items-center gap-2 text-gray-500"><i data-lucide="check" class="w-3 h-3 text-laser"></i> [14:02:11] Automated RFQs issued to 3 vendors</div>
+                                <div class="flex items-center gap-2 text-gray-500"><i data-lucide="check" class="w-3 h-3 text-laser"></i> [14:02:12] Quotes evaluated against policy rules</div>
+                                <div id="log-exec-target" class="text-gray-500 italic">[Waiting for executive approval click...]</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 md:py-32 px-4 md:px-6 relative overflow-hidden border-t border-white/5">
+        <div class="max-w-6xl mx-auto space-y-16">
+            <div class="text-center space-y-3">
+                <p class="text-xs font-mono text-gray-400 uppercase tracking-widest flex items-center justify-center gap-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-red-400"></i> Operational Disconnect
+                </p>
+                <h2 class="text-3xl md:text-5xl font-light text-white">Software without coordination creates friction.</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+                <div class="tilt-card glass-card p-6 md:p-8 rounded-2xl border-t-2 border-red-500/60 space-y-6" data-tilt data-tilt-max="10" data-tilt-speed="400">
                     <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
                         <i data-lucide="layers-slash" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-white">Siloed Tech Stack</h3>
+                    <h3 class="text-xl font-bold text-white">Data Silos</h3>
                     <p class="text-xs text-gray-400 leading-relaxed">
-                        PMS, POS, and Messaging don't talk automatically. Staff spend hours manually copying data between systems.
+                        PMS, POS, and Messaging don't synchronize automatically. Staff waste hours manually copying information across screens.
                     </p>
                     <div class="text-[10px] font-mono text-red-400 uppercase tracking-wider flex items-center gap-1.5 pt-4 border-t border-white/5">
-                        <i data-lucide="x" class="w-3.5 h-3.5"></i> High Error Rates
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i> Manual Latency
                     </div>
                 </div>
 
-                <div class="tilt-card glass-card p-8 rounded-2xl border-t-2 border-amber-500/60 space-y-6" data-tilt data-tilt-max="12" data-tilt-speed="400">
+                <div class="tilt-card glass-card p-6 md:p-8 rounded-2xl border-t-2 border-amber-500/60 space-y-6" data-tilt data-tilt-max="10" data-tilt-speed="400">
                     <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                         <i data-lucide="clock" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-white">Delayed Handoffs</h3>
+                    <h3 class="text-xl font-bold text-white">Delayed Response</h3>
                     <p class="text-xs text-gray-400 leading-relaxed">
-                        Guest requests stay stuck in group chats or email threads, slowing response times and damaging reviews.
+                        Guest requests get buried in messaging threads, resulting in slow resolutions and missed revenue opportunities.
                     </p>
                     <div class="text-[10px] font-mono text-amber-400 uppercase tracking-wider flex items-center gap-1.5 pt-4 border-t border-white/5">
-                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Guest Dissatisfaction
+                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Lost Upsell Opportunities
                     </div>
                 </div>
 
-                <div class="tilt-card glass-card p-8 rounded-2xl border-t-2 border-laser space-y-6" data-tilt data-tilt-max="12" data-tilt-speed="400">
+                <div class="tilt-card glass-card p-6 md:p-8 rounded-2xl border-t-2 border-laser space-y-6" data-tilt data-tilt-max="10" data-tilt-speed="400">
                     <div class="w-12 h-12 rounded-xl bg-laser/10 border border-laser/30 flex items-center justify-center text-laser">
                         <i data-lucide="zap" class="w-6 h-6"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-white">OtonomiQ Solution</h3>
+                    <h3 class="text-xl font-bold text-white">OtonomiQ Core OS</h3>
                     <p class="text-xs text-gray-300 leading-relaxed">
-                        An executive orchestration layer that senses events, coordinates departments, and executes with human oversight.
+                        An executive orchestration engine that detects events, recommends optimal decisions, and executes across systems.
                     </p>
                     <div class="text-[10px] font-mono text-laser uppercase tracking-wider flex items-center gap-1.5 pt-4 border-t border-white/5">
-                        <i data-lucide="check" class="w-3.5 h-3.5"></i> Instant Resolution
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i> Connected Execution
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="modules" class="py-32 px-6 bg-charcoal/40 border-y border-white/5">
-        <div class="max-w-6xl mx-auto space-y-20">
-            <div class="text-center space-y-4">
+    <section id="modules" class="py-24 md:py-32 px-4 md:px-6 bg-charcoal/40 border-y border-white/5">
+        <div class="max-w-6xl mx-auto space-y-16">
+            <div class="text-center space-y-3">
                 <p class="text-xs font-mono text-laser uppercase tracking-widest flex items-center justify-center gap-2">
                     <i data-lucide="boxes" class="w-4 h-4"></i> Modular Hospitality OS
                 </p>
-                <h2 class="text-3xl md:text-5xl font-light text-white">Built for every key revenue center.</h2>
+                <h2 class="text-3xl md:text-5xl font-light text-white">Deploy by revenue center. Scale freely.</h2>
             </div>
 
-            <div class="grid lg:grid-cols-3 gap-8">
-                
-                <div class="tilt-card glass-card p-8 rounded-2xl space-y-6 flex flex-col justify-between hover:border-laser transition-all duration-300 group" data-tilt data-tilt-max="10">
+            <div class="grid lg:grid-cols-3 gap-6 md:gap-8">
+                <div class="tilt-card glass-card p-6 md:p-8 rounded-2xl space-y-6 flex flex-col justify-between hover:border-laser transition-all duration-300 group" data-tilt data-tilt-max="8">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-laser/10 border border-laser/30 flex items-center justify-center text-laser group-hover:bg-laser group-hover:text-black transition-all duration-300">
-                            <i data-lucide="shopping-bag" class="w-7 h-7"></i>
+                        <div class="w-12 h-12 rounded-2xl bg-laser/10 border border-laser/30 flex items-center justify-center text-laser group-hover:bg-laser group-hover:text-black transition-all duration-300">
+                            <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                         </div>
                         <span class="text-xs font-mono text-laser block font-bold">01 — PROCUREMENT INTELLIGENCE</span>
-                        <h3 class="text-2xl font-bold text-white">Procurement & Purchasing</h3>
+                        <h3 class="text-xl md:text-2xl font-bold text-white">Procurement & RFQs</h3>
                         <p class="text-xs text-gray-400 leading-relaxed">
-                            Automatically analyze vendor quotes, manage reorder points, enforce budget caps, and generate manager approvals.
+                            Auto-compare vendor quotes, track stock limits, enforce budget rules, and trigger executive approvals seamlessly.
                         </p>
                     </div>
                     <ul class="space-y-2 text-xs font-mono text-gray-400 pt-6 border-t border-white/10">
-                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Automated Vendor RFQs</li>
-                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> AI Margin Optimization</li>
+                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Automated Supplier RFQs</li>
+                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Real-Time Margin Safeguards</li>
                     </ul>
                 </div>
 
-                <div class="tilt-card glass-card p-8 rounded-2xl space-y-6 flex flex-col justify-between hover:border-laser transition-all duration-300 group" data-tilt data-tilt-max="10">
+                <div class="tilt-card glass-card p-6 md:p-8 rounded-2xl space-y-6 flex flex-col justify-between hover:border-laser transition-all duration-300 group" data-tilt data-tilt-max="8">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-laser/10 border border-laser/30 flex items-center justify-center text-laser group-hover:bg-laser group-hover:text-black transition-all duration-300">
-                            <i data-lucide="line-chart" class="w-7 h-7"></i>
+                        <div class="w-12 h-12 rounded-2xl bg-laser/10 border border-laser/30 flex items-center justify-center text-laser group-hover:bg-laser group-hover:text-black transition-all duration-300">
+                            <i data-lucide="line-chart" class="w-6 h-6"></i>
                         </div>
-                        <span class="text-xs font-mono text-laser block font-bold">02 — REVENUE ORCHESTRATION</span>
-                        <h3 class="text-2xl font-bold text-white">Dynamic Pricing & Yield</h3>
+                        <span class="text-xs font-mono text-laser block font-bold">02 — REVENUE YIELD ENGINE</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-white">Dynamic Pricing & Yield</h3>
                         <p class="text-xs text-gray-400 leading-relaxed">
-                            Detect demand surges in real time, auto-adjust room rates across OTAs, and maximize overall RevPAR instantly.
+                            Sense booking surges, automatically calibrate room rates across OTAs, and capture high-margin upsells instantly.
                         </p>
                     </div>
                     <ul class="space-y-2 text-xs font-mono text-gray-400 pt-6 border-t border-white/10">
-                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Real-time OTA Channel Sync</li>
-                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Intelligent Upsell Triggers</li>
+                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> OTA Channel Synchronization</li>
+                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Automated Rate Calibration</li>
                     </ul>
                 </div>
 
-                <div class="tilt-card glass-card p-8 rounded-2xl space-y-6 flex flex-col justify-between hover:border-laser transition-all duration-300 group" data-tilt data-tilt-max="10">
+                <div class="tilt-card glass-card p-6 md:p-8 rounded-2xl space-y-6 flex flex-col justify-between hover:border-laser transition-all duration-300 group" data-tilt data-tilt-max="8">
                     <div class="space-y-4">
-                        <div class="w-14 h-14 rounded-2xl bg-laser/10 border border-laser/30 flex items-center justify-center text-laser group-hover:bg-laser group-hover:text-black transition-all duration-300">
-                            <i data-lucide="concierge-bell" class="w-7 h-7"></i>
+                        <div class="w-12 h-12 rounded-2xl bg-laser/10 border border-laser/30 flex items-center justify-center text-laser group-hover:bg-laser group-hover:text-black transition-all duration-300">
+                            <i data-lucide="concierge-bell" class="w-6 h-6"></i>
                         </div>
-                        <span class="text-xs font-mono text-laser block font-bold">03 — GUEST EXPERIENCE LOOP</span>
-                        <h3 class="text-2xl font-bold text-white">Guest Service Automation</h3>
+                        <span class="text-xs font-mono text-laser block font-bold">03 — GUEST SERVICE LOOP</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-white">Guest Concierge OS</h3>
                         <p class="text-xs text-gray-400 leading-relaxed">
-                            Turn WhatsApp and guest messages into instant action tasks for housekeeping, front desk, and room service.
+                            Transform guest messages into routed actions for housekeeping, dining, and front desk with zero human delay.
                         </p>
                     </div>
                     <ul class="space-y-2 text-xs font-mono text-gray-400 pt-6 border-t border-white/10">
-                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Zero Guest Wait Times</li>
-                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Automated Profile Enrichment</li>
+                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Instant Guest Routing</li>
+                        <li class="flex items-center gap-2 text-gray-200"><i data-lucide="check" class="w-4 h-4 text-laser"></i> Profile Memory Enrichment</li>
                     </ul>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <section id="live-mission" class="py-32 px-6">
-        <div class="max-w-5xl mx-auto space-y-12">
-            <div class="text-center space-y-4">
-                <p class="text-xs font-mono text-laser uppercase tracking-widest flex items-center justify-center gap-2">
-                    <i data-lucide="terminal" class="w-4 h-4"></i> Live Operation Simulation
-                </p>
-                <h2 class="text-3xl md:text-5xl font-light text-white">Interactive Operational Command</h2>
-            </div>
-
-            <div class="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
-                <div class="bg-white/5 px-6 py-4 border-b border-white/10 flex items-center justify-between text-xs font-mono">
-                    <div class="flex items-center gap-3">
-                        <span class="w-3 h-3 rounded-full bg-laser animate-ping"></span>
-                        <span class="text-white font-bold flex items-center gap-1.5"><i data-lucide="target" class="w-4 h-4 text-laser"></i> MISSION #M-9021</span>
-                    </div>
-                    <div class="text-laser font-semibold flex items-center gap-2">
-                        <i data-lucide="user-check" class="w-4 h-4"></i> Guest: Presidential Suite — VIP Tier I
-                    </div>
-                </div>
-
-                <div class="p-8 space-y-8 text-sm">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
-                            <span class="text-[10px] font-mono text-laser flex items-center gap-1.5">
-                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> GUEST INPUT DETECTED
-                            </span>
-                            <div class="text-gray-100 font-mono text-xs p-3 rounded-lg bg-black/50 border border-white/10">
-                                "Can we get airport transfer for 3 PM tomorrow and a late checkout?"
-                            </div>
-                            <div class="text-[10px] text-gray-500 font-mono">Channel: WhatsApp Concierge • 14:10:02</div>
-                        </div>
-
-                        <div class="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-3">
-                            <span class="text-[10px] font-mono text-laser flex items-center gap-1.5">
-                                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> CONTEXT & POLICY CHECK
-                            </span>
-                            <div class="text-xs text-gray-300 font-mono space-y-1.5">
-                                <div class="flex items-center gap-2 text-green-400"><i data-lucide="check" class="w-3.5 h-3.5"></i> PMS: Late checkout approved ($0 VIP)</div>
-                                <div class="flex items-center gap-2 text-green-400"><i data-lucide="check" class="w-3.5 h-3.5"></i> Fleet: BMW 7-Series available at 15:00</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="p-6 rounded-xl bg-laser/10 border border-laser/40 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-mono text-laser font-bold flex items-center gap-2">
-                                <i data-lucide="zap" class="w-4 h-4"></i> RECOMMENDED ACTION PLAN
-                            </span>
-                            <span class="text-[10px] font-mono bg-laser/20 text-laser px-3 py-1 rounded-full border border-laser/40 font-bold">HUMAN APPROVAL REQUIRED</span>
-                        </div>
-                        <p class="text-xs text-gray-200 font-mono">
-                            Action Proposal: Dispatch Private Chauffeur at 15:00 + Grant 14:00 Checkout in Opera PMS.
-                        </p>
-
-                        <div class="flex items-center gap-4 pt-2">
-                            <button id="exec-btn" onclick="executeMission()" class="px-8 py-3 rounded-xl bg-laser text-black font-mono text-xs font-bold hover:shadow-[0_0_30px_rgba(0,242,254,0.8)] transition-all flex items-center gap-2">
-                                <i data-lucide="check-circle" class="w-4 h-4"></i> Approve & Execute Workflow
-                            </button>
-                            <span class="text-[10px] font-mono text-gray-400 flex items-center gap-1">
-                                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-laser"></i> General Manager Authorized
-                            </span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="operating-loop" class="relative min-h-[250vh] border-t border-white/5 bg-charcoal/30">
-        <div id="sticky-loop" class="sticky top-0 h-screen flex flex-col justify-center items-center px-6 overflow-hidden">
-            <div class="text-center space-y-2 mb-8">
+    <section id="operating-loop" class="relative min-h-[220vh] sm:min-h-[250vh] border-t border-white/5 bg-charcoal/30">
+        <div id="sticky-loop" class="sticky top-0 h-screen flex flex-col justify-center items-center px-4 md:px-6 overflow-hidden">
+            <div class="text-center space-y-2 mb-6 sm:mb-8">
                 <p class="text-xs font-mono text-laser uppercase tracking-widest flex items-center justify-center gap-2">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Core Operating Architecture
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Execution Engine Loop
                 </p>
-                <h2 class="text-2xl md:text-4xl font-light text-white">The Continuous Operating Loop</h2>
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-light text-white">Continuous Operating Loop</h2>
             </div>
 
-            <div class="relative w-full max-w-4xl h-48 flex items-center justify-center">
-                <div class="loop-step absolute text-6xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-4" id="step-1">
-                    <i data-lucide="radio" class="w-16 h-16 md:w-24 md:h-24"></i> SENSE
+            <div class="relative w-full max-w-4xl h-40 sm:h-48 flex items-center justify-center">
+                <div class="loop-step absolute text-5xl sm:text-7xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-3 sm:gap-4" id="step-1">
+                    <i data-lucide="radio" class="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24"></i> SENSE
                 </div>
-                <div class="loop-step absolute text-6xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-4" id="step-2">
-                    <i data-lucide="brain" class="w-16 h-16 md:w-24 md:h-24"></i> UNDERSTAND
+                <div class="loop-step absolute text-5xl sm:text-7xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-3 sm:gap-4" id="step-2">
+                    <i data-lucide="brain" class="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24"></i> UNDERSTAND
                 </div>
-                <div class="loop-step absolute text-6xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-4" id="step-3">
-                    <i data-lucide="lightbulb" class="w-16 h-16 md:w-24 md:h-24"></i> DECIDE
+                <div class="loop-step absolute text-5xl sm:text-7xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-3 sm:gap-4" id="step-3">
+                    <i data-lucide="lightbulb" class="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24"></i> DECIDE
                 </div>
-                <div class="loop-step absolute text-6xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-4" id="step-4">
-                    <i data-lucide="zap" class="w-16 h-16 md:w-24 md:h-24"></i> ACT
+                <div class="loop-step absolute text-5xl sm:text-7xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-3 sm:gap-4" id="step-4">
+                    <i data-lucide="zap" class="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24"></i> ACT
                 </div>
-                <div class="loop-step absolute text-6xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-4" id="step-5">
-                    <i data-lucide="shield-check" class="w-16 h-16 md:w-24 md:h-24"></i> VERIFY
+                <div class="loop-step absolute text-5xl sm:text-7xl md:text-8xl font-black text-laser tracking-tight opacity-0 scale-90 flex items-center gap-3 sm:gap-4" id="step-5">
+                    <i data-lucide="shield-check" class="w-12 h-12 sm:w-20 sm:h-20 md:w-24 md:h-24"></i> VERIFY
                 </div>
             </div>
 
-            <p class="text-center text-sm text-gray-400 max-w-xl mx-auto font-light mt-8">
-                Scroll to experience how OtonomiQ turns hospitality signals into verified, high-margin execution.
+            <p class="text-center text-xs sm:text-sm text-gray-400 max-w-xl mx-auto font-light mt-6 sm:mt-8 px-4">
+                Scroll to view how OtonomiQ turns hospitality signals into verified, high-margin action.
             </p>
         </div>
     </section>
 
-    <section id="impact" class="py-32 px-6 border-t border-white/5">
+    <section id="impact" class="py-24 md:py-32 px-4 md:px-6 border-t border-white/5">
         <div class="max-w-4xl mx-auto space-y-12">
-            <div class="text-center space-y-4">
+            <div class="text-center space-y-3">
                 <p class="text-xs font-mono text-laser uppercase tracking-widest flex items-center justify-center gap-2">
-                    <i data-lucide="calculator" class="w-4 h-4"></i> Executive Value Model
+                    <i data-lucide="calculator" class="w-4 h-4"></i> Executive Return Estimator
                 </p>
-                <h2 class="text-3xl md:text-5xl font-light text-white">Measure your operational impact.</h2>
+                <h2 class="text-3xl md:text-5xl font-light text-white">Quantify your operational gain.</h2>
             </div>
 
-            <div class="glass-card p-8 rounded-2xl border border-white/10 space-y-8">
-                <div class="grid md:grid-cols-2 gap-8">
+            <div class="glass-card p-6 sm:p-8 rounded-2xl border border-white/10 space-y-8">
+                <div class="grid md:grid-cols-2 gap-6 sm:gap-8">
                     <div class="space-y-4">
                         <label class="block text-xs font-mono text-gray-400 flex items-center gap-2">
                             <i data-lucide="hotel" class="w-4 h-4 text-laser"></i> Total Room Keys
@@ -449,27 +509,27 @@
 
                 <div class="pt-6 border-t border-white/10 grid md:grid-cols-2 gap-6 text-center">
                     <div class="p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-                        <span class="block text-xs font-mono text-gray-400">ESTIMATED ANNUAL ROI RECOVERED</span>
+                        <span class="block text-xs font-mono text-gray-400">ESTIMATED ANNUAL VALUE RECOVERED</span>
                         <span class="text-3xl font-extrabold text-laser" id="roi-val">$245,000 / Yr</span>
-                        <span class="block text-[10px] text-gray-500 font-mono">Via automated labor & upsell conversion</span>
+                        <span class="block text-[10px] text-gray-500 font-mono">Via labor efficiency & upsell capture</span>
                     </div>
                     <div class="p-6 rounded-2xl bg-white/[0.02] border border-white/10 space-y-1">
-                        <span class="block text-xs font-mono text-gray-400">RESPONSE SPEED REDUCTION</span>
+                        <span class="block text-xs font-mono text-gray-400">RESPONSE LATENCY REDUCTION</span>
                         <span class="text-3xl font-extrabold text-white">~85% Faster</span>
-                        <span class="block text-[10px] text-gray-500 font-mono">Zero delay in department routing</span>
+                        <span class="block text-[10px] text-gray-500 font-mono">Eliminates multi-department lag</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="book" class="py-32 px-6 border-t border-white/5 bg-charcoal/60 text-center">
+    <section id="book" class="py-24 md:py-32 px-4 md:px-6 border-t border-white/5 bg-charcoal/60 text-center">
         <div class="max-w-4xl mx-auto space-y-8">
-            <h2 class="text-3xl md:text-5xl font-light text-white">Ready to elevate your hotel operations?</h2>
-            <p class="text-xl text-laser font-normal">Start with one high-impact module. Prove value. Scale effortlessly.</p>
+            <h2 class="text-3xl md:text-5xl font-light text-white">Ready to connect your hotel operations?</h2>
+            <p class="text-lg md:text-xl text-laser font-normal">Start with one high-impact workflow. Demonstrate ROI. Scale effortlessly.</p>
 
-            <div class="pt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="#" class="w-full sm:w-auto px-10 py-5 rounded-full bg-laser text-black font-extrabold text-xs uppercase tracking-widest hover:shadow-[0_0_35px_rgba(0,242,254,0.9)] transition-all flex items-center justify-center gap-2">
+            <div class="pt-6 flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="#" class="w-full sm:w-auto px-10 py-4 sm:py-5 rounded-full bg-laser text-black font-extrabold text-xs uppercase tracking-widest hover:shadow-[0_0_35px_rgba(0,242,254,0.9)] transition-all flex items-center justify-center gap-2">
                     <i data-lucide="calendar" class="w-4 h-4"></i> Book Executive Demo
                 </a>
             </div>
@@ -479,9 +539,9 @@
     <footer class="py-12 px-6 border-t border-white/5 text-center text-xs text-gray-500 font-mono">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-2">
-                <i data-lucide="cpu" class="w-4 h-4 text-laser"></i> OTONOMIQ HOTEL OS — THE ENTERPRISE EXECUTION LAYER
+                <i data-lucide="cpu" class="w-4 h-4 text-laser"></i> OTONOMIQ HOTEL OS — THE EXECUTIVE EXECUTION LAYER
             </div>
-            <div>Built for Hotel Owners, General Managers & Operating Groups.</div>
+            <div>Built for Hotel Owners, General Managers & Hospitality Operators.</div>
         </div>
     </footer>
 
@@ -492,7 +552,7 @@
         // Register GSAP ScrollTrigger
         gsap.registerPlugin(ScrollTrigger);
 
-        // 1. Apple-Grade Hero Scroll Zoom Engine
+        // 1. Hero Zoom & Responsive Parallax Scroll Timeline
         const heroTl = gsap.timeline({
             scrollTrigger: {
                 trigger: "#hero",
@@ -504,33 +564,33 @@
             }
         });
 
-        heroTl.to("#hero-text", { opacity: 0, scale: 0.9, y: -60, duration: 0.4 }, 0)
-              .to("#hero-dashboard", { scale: 1.2, y: -90, boxShadow: "0 0 60px rgba(0, 242, 254, 0.35)", duration: 1 }, 0)
-              .to(".hero-float-card", { y: -150, opacity: 0, duration: 0.6 }, 0);
+        heroTl.to("#hero-text", { opacity: 0, scale: 0.9, y: -50, duration: 0.4 }, 0)
+              .to("#hero-dashboard", { scale: 1.15, y: -70, boxShadow: "0 0 60px rgba(0, 242, 254, 0.35)", duration: 1 }, 0)
+              .to(".hero-float-card", { y: -120, opacity: 0, duration: 0.6 }, 0);
 
-        // 2. Interactive Parallax Card Movement via VanillaTilt
-        VanillaTilt.init(document.querySelectorAll(".tilt-card"), {
-            max: 12,
-            speed: 400,
-            glare: true,
-            "max-glare": 0.2,
-        });
-
-        // 3. Floating Card Parallax Scroll Effect
-        gsap.utils.toArray('[data-speed]').forEach(layer => {
-            const speed = parseFloat(layer.getAttribute('data-speed'));
-            gsap.to(layer, {
-                y: -100 * speed,
+        // 2. Multi-Layer Parallax Background Icons Movement
+        gsap.utils.toArray('[data-parallax-speed]').forEach(icon => {
+            const speed = parseFloat(icon.getAttribute('data-parallax-speed'));
+            gsap.to(icon, {
+                y: -150 * speed,
                 scrollTrigger: {
-                    trigger: "#hero",
-                    start: "top top",
+                    trigger: "#live-simulator",
+                    start: "top bottom",
                     end: "bottom top",
                     scrub: true
                 }
             });
         });
 
-        // 4. Sticky Operating Loop Step Animations
+        // 3. Card 3D Parallax Tilt Initialization
+        VanillaTilt.init(document.querySelectorAll(".tilt-card"), {
+            max: 10,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.2,
+        });
+
+        // 4. Sticky Operating Loop Animation
         const loopSteps = gsap.utils.toArray(".loop-step");
         const loopTl = gsap.timeline({
             scrollTrigger: {
@@ -548,12 +608,91 @@
                   .to(step, { opacity: 0, scale: 1.15, duration: 0.5 }, "+=0.3");
         });
 
-        // 5. Interactive Demo Trigger
-        function executeMission() {
-            const btn = document.getElementById('exec-btn');
-            btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> WORKFLOW EXECUTED IN 12s';
-            btn.classList.remove('bg-laser', 'text-black');
-            btn.classList.add('bg-green-500', 'text-black');
+        // 5. INTERACTIVE DASHBOARD SIMULATOR DATA & SCENARIO SWITCHER
+        const scenarios = {
+            procurement: {
+                title: "SCENARIO: AUTOMATED PROCUREMENT & VENDOR RFQ",
+                signal: `
+                    <div class="text-gray-400">Event: Inventory Threshold Triggered</div>
+                    <div class="text-laser font-bold">Item: Premium Espresso Beans (1.5 kg remaining)</div>
+                    <div class="text-gray-500 text-[10px]">Source: Outlet POS Inventory API</div>
+                `,
+                context: `
+                    <div class="flex items-center justify-between p-2 rounded bg-white/5"><span>Approved Vendors</span><span class="text-green-400">3 Suppliers</span></div>
+                    <div class="flex items-center justify-between p-2 rounded bg-white/5"><span>Budget Limit</span><span class="text-green-400">$1,500 Available</span></div>
+                `,
+                recommendation: "Generate Purchase Order #PO-8820 for 50kg Espresso Beans from Supplier B ($12.50/kg — Lowest Quote & Fast 24h Delivery).",
+                execLog: "[14:02:14] PO #PO-8820 sent to Supplier B via EDI • Inventory reorder locked."
+            },
+            guest: {
+                title: "SCENARIO: VIP GUEST REQUEST & MULTI-DEPARTMENT ROUTING",
+                signal: `
+                    <div class="text-gray-400">Event: Guest WhatsApp Message Captured</div>
+                    <div class="text-laser font-bold">"Can I get a late checkout at 2 PM and airport transfer?"</div>
+                    <div class="text-gray-500 text-[10px]">Source: Concierge WhatsApp API • Room 502</div>
+                `,
+                context: `
+                    <div class="flex items-center justify-between p-2 rounded bg-white/5"><span>PMS Profile</span><span class="text-laser font-bold">VIP Tier I (Suite)</span></div>
+                    <div class="flex items-center justify-between p-2 rounded bg-white/5"><span>Chauffeur Availability</span><span class="text-green-400">BMW 7-Series Available</span></div>
+                `,
+                recommendation: "Approve 14:00 Late Checkout in PMS ($0 VIP Fee) + Schedule Private Airport Transfer for 14:15.",
+                execLog: "[14:02:14] Opera PMS updated to 14:00 Checkout • Driver dispatched • WhatsApp confirmation sent."
+            },
+            revenue: {
+                title: "SCENARIO: DYNAMIC YIELD RATE CALIBRATION",
+                signal: `
+                    <div class="text-gray-400">Event: High Booking Pace Spike (+45%)</div>
+                    <div class="text-laser font-bold">Weekend Occupancy reached 88% (Target: 75%)</div>
+                    <div class="text-gray-500 text-[10px]">Source: OTA Channel Engine</div>
+                `,
+                context: `
+                    <div class="flex items-center justify-between p-2 rounded bg-white/5"><span>Compset Rate Range</span><span class="text-gray-300">$320 – $380</span></div>
+                    <div class="flex items-center justify-between p-2 rounded bg-white/5"><span>Current Deluxe Rate</span><span class="text-amber-400">$290 ADR</span></div>
+                `,
+                recommendation: "Increase Deluxe Room Rate to $345 (+18.9%) across Booking.com, Expedia, and Direct Web Engine.",
+                execLog: "[14:02:14] Rate adjusted to $345 across 6 OTA channels simultaneously • RevPAR projected +$14.20."
+            }
+        };
+
+        let currentScenario = 'procurement';
+
+        function switchTab(tabKey) {
+            currentScenario = tabKey;
+            
+            // Update Tab UI
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active-tab');
+                btn.classList.add('border-white/10', 'text-gray-400');
+            });
+            const selectedBtn = document.getElementById(`tab-${tabKey}`);
+            selectedBtn.classList.add('active-tab');
+            selectedBtn.classList.remove('border-white/10', 'text-gray-400');
+
+            // Update Scenario Data
+            const data = scenarios[tabKey];
+            document.getElementById('sim-title').innerText = data.title;
+            document.getElementById('sim-signal-box').innerHTML = data.signal;
+            document.getElementById('sim-context-box').innerHTML = data.context;
+            document.getElementById('sim-recommendation').innerText = data.recommendation;
+
+            // Reset Execution Log Button
+            const execBtn = document.getElementById('sim-exec-btn');
+            execBtn.innerHTML = '<i data-lucide="play-circle" class="w-4 h-4"></i> Execute Action in Real-Time';
+            execBtn.classList.remove('bg-green-500');
+            execBtn.classList.add('bg-laser');
+
+            document.getElementById('log-exec-target').innerHTML = '<span class="text-gray-500 italic">[Waiting for executive approval click...]</span>';
+            lucide.createIcons();
+        }
+
+        function triggerSimulationExecution() {
+            const data = scenarios[currentScenario];
+            const execBtn = document.getElementById('sim-exec-btn');
+            execBtn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> EXECUTED IN 12ms';
+            execBtn.classList.remove('bg-laser');
+            execBtn.classList.add('bg-green-500');
+
+            document.getElementById('log-exec-target').innerHTML = `<span class="text-green-400 font-bold">${data.execLog}</span>`;
             lucide.createIcons();
         }
 
