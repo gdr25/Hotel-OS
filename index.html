@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OtonomiQ Hotel OS — The Intelligence & Execution Layer</title>
+    <title>OtonomiQ Hotel OS — Interactive Parallax Showcase</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -26,6 +26,10 @@
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
     <style>
         body {
             background-color: #050507;
@@ -37,19 +41,17 @@
             color: #00f2fe;
             text-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
         }
-        .laser-border {
-            border-color: rgba(0, 242, 254, 0.4);
-        }
         .glass-panel {
             background: rgba(18, 20, 29, 0.5);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
         }
         /* Custom scrollbar */
         ::-webkit-scrollbar {
@@ -65,13 +67,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #00f2fe;
         }
-        /* Grid Background Pattern */
-        .bg-grid {
-            background-size: 40px 40px;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-        }
     </style>
 </head>
 <body class="bg-obsidian text-gray-200 antialiased selection:bg-laser selection:text-black bg-grid">
@@ -83,9 +78,9 @@
                 OTONOMIQ <span class="text-xs font-normal text-gray-500 tracking-normal border border-white/10 px-1.5 py-0.5 rounded">OS</span>
             </a>
             <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-400">
-                <a href="#experience" class="hover:text-white transition-colors">Experience</a>
+                <a href="#hero" class="hover:text-white transition-colors">Experience</a>
                 <a href="#hotel-os" class="hover:text-white transition-colors">Hotel OS</a>
-                <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
+                <a href="#loop-container" class="hover:text-white transition-colors">How It Works</a>
                 <a href="#impact" class="hover:text-white transition-colors">Impact</a>
                 <a href="#trust" class="hover:text-white transition-colors">Trust</a>
             </div>
@@ -97,10 +92,11 @@
         </div>
     </nav>
 
-    <section id="experience" class="relative min-h-screen flex flex-col justify-center items-center pt-24 px-6 text-center overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-obsidian/50 to-obsidian pointer-events-none"></div>
-        
-        <div class="max-w-4xl mx-auto z-10 space-y-6">
+    <section id="hero" class="relative min-h-screen flex flex-col justify-center items-center pt-24 px-6 text-center overflow-hidden">
+        <div class="parallax-bg absolute -top-10 -left-10 w-96 h-96 bg-laser/10 rounded-full blur-3xl pointer-events-none" data-speed="0.2"></div>
+        <div class="parallax-bg absolute top-1/2 -right-10 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" data-speed="0.5"></div>
+
+        <div class="parallax-content max-w-4xl mx-auto z-10 space-y-6" data-speed="0.9">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-laser/30 bg-laser/5 text-laser text-xs tracking-wide">
                 <span>SIMULATION ENVIRONMENT</span>
             </div>
@@ -115,22 +111,22 @@
                 <a href="#live-mission" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-laser text-black font-semibold text-sm hover:shadow-[0_0_25px_rgba(0,242,254,0.5)] transition-all duration-300">
                     Experience OtonomiQ
                 </a>
-                <a href="#how-it-works" class="w-full sm:w-auto px-8 py-3.5 rounded-full glass-panel hover:bg-white/10 text-white font-medium text-sm transition-all duration-300">
+                <a href="#loop-container" class="w-full sm:w-auto px-8 py-3.5 rounded-full glass-panel hover:bg-white/10 text-white font-medium text-sm transition-all duration-300">
                     See How It Works
                 </a>
             </div>
         </div>
 
-        <div class="w-full max-w-5xl mx-auto mt-16 p-8 glass-panel rounded-2xl relative border border-white/10 z-10">
+        <div class="parallax-card w-full max-w-5xl mx-auto mt-16 p-8 glass-panel rounded-2xl relative border border-white/10 z-10" data-speed="0.6">
             <div class="text-xs font-mono text-gray-500 mb-6 flex justify-between items-center border-b border-white/5 pb-3">
                 <span>OPERATIONAL NETWORK ARCHITECTURE</span>
-                <span class="text-laser flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-laser"></span> LIVE CONNECTIVITY</span>
+                <span class="text-laser flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-laser animate-ping"></span> LIVE CONNECTIVITY</span>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-xs font-mono">
-                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">PMS LAYER</div>
-                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">POS TERMINALS</div>
-                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">CRM CONTEXT</div>
-                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">ERP FINANCE</div>
+                <div class="sys-node p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400">PMS LAYER</div>
+                <div class="sys-node p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400">POS TERMINALS</div>
+                <div class="sys-node p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400">CRM CONTEXT</div>
+                <div class="sys-node p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400">ERP FINANCE</div>
             </div>
             <div class="my-6 relative flex justify-center items-center">
                 <div class="w-full h-px bg-gradient-to-r from-transparent via-laser/40 to-transparent"></div>
@@ -139,15 +135,15 @@
                 </div>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-xs font-mono">
-                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">OTA CHANNELS</div>
-                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">GUEST MESSAGING</div>
-                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">REVENUE DATA</div>
-                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">SUPPLIER NETWORK</div>
+                <div class="sys-node p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400">OTA CHANNELS</div>
+                <div class="sys-node p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400">GUEST MESSAGING</div>
+                <div class="sys-node p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400">REVENUE DATA</div>
+                <div class="sys-node p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400">SUPPLIER NETWORK</div>
             </div>
         </div>
     </section>
 
-    <section class="py-32 px-6 border-t border-white/5">
+    <section class="py-32 px-6 border-t border-white/5 relative">
         <div class="max-w-5xl mx-auto text-center space-y-12">
             <p class="text-xs font-mono text-gray-500 uppercase tracking-widest">Operational Reality</p>
             <div class="space-y-4">
@@ -156,12 +152,12 @@
             </div>
             <div class="pt-8">
                 <div class="flex flex-wrap justify-center gap-3 text-xs font-mono text-gray-400">
-                    <span class="px-4 py-2 glass-panel rounded-full border border-red-500/20 text-red-300">PMS</span>
+                    <span class="parallax-bg px-4 py-2 glass-panel rounded-full border border-red-500/20 text-red-300" data-speed="0.8">PMS</span>
                     <span class="px-4 py-2 glass-panel rounded-full border border-white/5">POS</span>
                     <span class="px-4 py-2 glass-panel rounded-full border border-white/5">ERP</span>
-                    <span class="px-4 py-2 glass-panel rounded-full border border-white/5">CRM</span>
+                    <span class="parallax-bg px-4 py-2 glass-panel rounded-full border border-white/5" data-speed="1.2">CRM</span>
                     <span class="px-4 py-2 glass-panel rounded-full border border-red-500/20 text-red-300">Email Threads</span>
-                    <span class="px-4 py-2 glass-panel rounded-full border border-white/5">WhatsApp</span>
+                    <span class="parallax-bg px-4 py-2 glass-panel rounded-full border border-white/5" data-speed="0.9">WhatsApp</span>
                     <span class="px-4 py-2 glass-panel rounded-full border border-red-500/20 text-red-300">Spreadsheets</span>
                 </div>
             </div>
@@ -331,7 +327,6 @@
                 </div>
 
                 <div class="p-6 md:p-8 space-y-8 text-sm">
-                    
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
                             <span class="text-[10px] font-mono text-laser">1. SENSE</span>
@@ -356,7 +351,7 @@
                             Action Proposal: Grant 14:00 checkout + Reserve Table 4 at 20:00 (Preferred Dining Spot).
                         </p>
                         <div class="flex items-center gap-4 pt-2">
-                            <button onclick="this.innerText='APPROVED ✓'; this.classList.add('bg-green-500','text-black');" class="px-6 py-2 rounded bg-laser text-black font-mono text-xs font-bold transition-all">
+                            <button id="approve-btn" onclick="this.innerText='APPROVED ✓'; this.classList.add('bg-green-500','text-black');" class="px-6 py-2 rounded bg-laser text-black font-mono text-xs font-bold transition-all">
                                 Approve Action
                             </button>
                             <span class="text-[10px] font-mono text-gray-400">Duty Manager: A. Vance (Active)</span>
@@ -376,7 +371,6 @@
                             <div class="text-gray-400">✓ Profile updated: Guest prefers Table 4</div>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="bg-white/5 px-6 py-3 border-t border-white/5 text-center text-xs font-mono text-gray-400">
@@ -386,42 +380,24 @@
         </div>
     </section>
 
-    <section id="how-it-works" class="py-32 px-6 border-t border-white/5">
-        <div class="max-w-5xl mx-auto space-y-16">
-            <div class="text-center space-y-4">
-                <p class="text-xs font-mono text-laser uppercase tracking-widest">Operating Architecture</p>
-                <h2 class="text-3xl md:text-5xl font-light text-white">The OtonomiQ Operating Loop</h2>
+    <section id="loop-container" class="relative min-h-screen border-t border-white/5 bg-charcoal/20">
+        <div id="sticky-loop" class="sticky top-0 h-screen flex flex-col justify-center items-center px-6 overflow-hidden">
+            <div class="text-center space-y-2 mb-12">
+                <p class="text-xs font-mono text-laser uppercase tracking-widest">Interactive Execution Signature</p>
+                <h2 class="text-2xl md:text-4xl font-light text-white">The Operating Loop</h2>
             </div>
 
-            <div class="grid md:grid-cols-6 gap-4 text-center font-mono">
-                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
-                    <span class="block text-laser text-lg font-bold mb-2">01</span>
-                    <span class="text-xs text-white">SENSE</span>
-                </div>
-                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
-                    <span class="block text-laser text-lg font-bold mb-2">02</span>
-                    <span class="text-xs text-white">UNDERSTAND</span>
-                </div>
-                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
-                    <span class="block text-laser text-lg font-bold mb-2">03</span>
-                    <span class="text-xs text-white">DECIDE</span>
-                </div>
-                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
-                    <span class="block text-laser text-lg font-bold mb-2">04</span>
-                    <span class="text-xs text-white">ACT</span>
-                </div>
-                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
-                    <span class="block text-laser text-lg font-bold mb-2">05</span>
-                    <span class="text-xs text-white">VERIFY</span>
-                </div>
-                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
-                    <span class="block text-laser text-lg font-bold mb-2">06</span>
-                    <span class="text-xs text-white">LEARN</span>
-                </div>
+            <div class="relative w-full max-w-4xl h-48 flex items-center justify-center">
+                <div class="loop-step absolute text-5xl md:text-8xl font-black text-laser tracking-tighter opacity-0 scale-95" id="step-1">SENSE</div>
+                <div class="loop-step absolute text-5xl md:text-8xl font-black text-laser tracking-tighter opacity-0 scale-95" id="step-2">UNDERSTAND</div>
+                <div class="loop-step absolute text-5xl md:text-8xl font-black text-laser tracking-tighter opacity-0 scale-95" id="step-3">DECIDE</div>
+                <div class="loop-step absolute text-5xl md:text-8xl font-black text-laser tracking-tighter opacity-0 scale-95" id="step-4">ACT</div>
+                <div class="loop-step absolute text-5xl md:text-8xl font-black text-laser tracking-tighter opacity-0 scale-95" id="step-5">VERIFY</div>
+                <div class="loop-step absolute text-5xl md:text-8xl font-black text-laser tracking-tighter opacity-0 scale-95" id="step-6">LEARN</div>
             </div>
 
-            <p class="text-center text-sm text-gray-400 max-w-xl mx-auto font-light">
-                Every mission follows the same operating logic — turning signals into decisions, decisions into actions, and actions into new intelligence.
+            <p class="text-center text-sm text-gray-400 max-w-xl mx-auto font-light mt-8">
+                Scroll to watch OtonomiQ turn operational signals into executed workflow intelligence.
             </p>
         </div>
     </section>
@@ -536,5 +512,56 @@
         </div>
     </footer>
 
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // 1. Multi-layer Parallax Effects for Elements with data-speed
+        gsap.utils.toArray('[data-speed]').forEach(layer => {
+            const speed = parseFloat(layer.getAttribute('data-speed'));
+            gsap.to(layer, {
+                y: (i, target) => (1 - speed) * ScrollTrigger.maxScroll(window),
+                ease: "none",
+                scrollTrigger: {
+                    start: "top top",
+                    end: "max",
+                    invalidateOnRefresh: true,
+                    scrub: 0.5
+                }
+            });
+        });
+
+        // 2. Network Node Connection Motion in Hero
+        gsap.from(".sys-node", {
+            scrollTrigger: {
+                trigger: "#hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            scale: 0.8,
+            opacity: 0.3,
+            y: 30,
+            stagger: 0.1
+        });
+
+        // 3. Sticky Operating Loop Pinning and Text Sequences
+        const loopSteps = gsap.utils.toArray(".loop-step");
+        
+        const loopTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#loop-container",
+                start: "top top",
+                end: "+=300%", // Length of scroll duration
+                pin: "#sticky-loop",
+                scrub: 1,
+                anticipatePin: 1
+            }
+        });
+
+        loopSteps.forEach((step, i) => {
+            loopTl.to(step, { opacity: 1, scale: 1, duration: 0.5 })
+                  .to(step, { opacity: 0, scale: 1.05, duration: 0.5 }, "+=0.5");
+        });
+    </script>
 </body>
 </html>
