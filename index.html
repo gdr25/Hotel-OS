@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OtonomiQ Hotel OS — The Intelligence & Execution Layer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: '#050507',
+                        charcoal: '#0d0e12',
+                        glass: 'rgba(255, 255, 255, 0.03)',
+                        glassBorder: 'rgba(255, 255, 255, 0.08)',
+                        laser: '#00f2fe',
+                        laserGlow: 'rgba(0, 242, 254, 0.15)'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050507;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .laser-text {
+            color: #00f2fe;
+            text-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+        }
+        .laser-border {
+            border-color: rgba(0, 242, 254, 0.4);
+        }
+        .glass-panel {
+            background: rgba(18, 20, 29, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050507;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f2fe;
+        }
+        /* Grid Background Pattern */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-obsidian text-gray-200 antialiased selection:bg-laser selection:text-black bg-grid">
+
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/5 py-4 px-6 md:px-12 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="#" class="text-xl font-bold tracking-widest text-white flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-laser inline-block animate-pulse"></span>
+                OTONOMIQ <span class="text-xs font-normal text-gray-500 tracking-normal border border-white/10 px-1.5 py-0.5 rounded">OS</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-400">
+                <a href="#experience" class="hover:text-white transition-colors">Experience</a>
+                <a href="#hotel-os" class="hover:text-white transition-colors">Hotel OS</a>
+                <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
+                <a href="#impact" class="hover:text-white transition-colors">Impact</a>
+                <a href="#trust" class="hover:text-white transition-colors">Trust</a>
+            </div>
+            <div>
+                <a href="#book" class="text-xs font-semibold uppercase tracking-wider bg-white/10 hover:bg-laser hover:text-black text-white px-4 py-2.5 rounded-full border border-white/10 transition-all duration-300">
+                    Book a Demo
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="experience" class="relative min-h-screen flex flex-col justify-center items-center pt-24 px-6 text-center overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-obsidian/50 to-obsidian pointer-events-none"></div>
+        
+        <div class="max-w-4xl mx-auto z-10 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-laser/30 bg-laser/5 text-laser text-xs tracking-wide">
+                <span>SIMULATION ENVIRONMENT</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-light tracking-tight text-white leading-tight">
+                Hotels have systems.<br/>
+                <span class="font-normal text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-laser">Now they need intelligence that acts.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
+                OtonomiQ Hotel OS connects the context, decisions, and workflows behind hospitality operations — helping teams understand what is happening, decide what matters, and execute with control.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <a href="#live-mission" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-laser text-black font-semibold text-sm hover:shadow-[0_0_25px_rgba(0,242,254,0.5)] transition-all duration-300">
+                    Experience OtonomiQ
+                </a>
+                <a href="#how-it-works" class="w-full sm:w-auto px-8 py-3.5 rounded-full glass-panel hover:bg-white/10 text-white font-medium text-sm transition-all duration-300">
+                    See How It Works
+                </a>
+            </div>
+        </div>
+
+        <div class="w-full max-w-5xl mx-auto mt-16 p-8 glass-panel rounded-2xl relative border border-white/10 z-10">
+            <div class="text-xs font-mono text-gray-500 mb-6 flex justify-between items-center border-b border-white/5 pb-3">
+                <span>OPERATIONAL NETWORK ARCHITECTURE</span>
+                <span class="text-laser flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-laser"></span> LIVE CONNECTIVITY</span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-xs font-mono">
+                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">PMS LAYER</div>
+                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">POS TERMINALS</div>
+                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">CRM CONTEXT</div>
+                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">ERP FINANCE</div>
+            </div>
+            <div class="my-6 relative flex justify-center items-center">
+                <div class="w-full h-px bg-gradient-to-r from-transparent via-laser/40 to-transparent"></div>
+                <div class="absolute bg-obsidian border border-laser text-laser px-6 py-2 rounded-full font-semibold text-xs tracking-widest shadow-[0_0_15px_rgba(0,242,254,0.2)]">
+                    OTONOMIQ EXECUTION LAYER
+                </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-xs font-mono">
+                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">OTA CHANNELS</div>
+                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">GUEST MESSAGING</div>
+                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">REVENUE DATA</div>
+                <div class="p-4 rounded border border-white/5 bg-white/[0.01] text-gray-400 hover:border-laser/50 transition-colors">SUPPLIER NETWORK</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 px-6 border-t border-white/5">
+        <div class="max-w-5xl mx-auto text-center space-y-12">
+            <p class="text-xs font-mono text-gray-500 uppercase tracking-widest">Operational Reality</p>
+            <div class="space-y-4">
+                <h2 class="text-3xl md:text-5xl font-light text-gray-400">The hotel isn't short on software.</h2>
+                <h2 class="text-4xl md:text-6xl font-normal text-white">It's short on coordination.</h2>
+            </div>
+            <div class="pt-8">
+                <div class="flex flex-wrap justify-center gap-3 text-xs font-mono text-gray-400">
+                    <span class="px-4 py-2 glass-panel rounded-full border border-red-500/20 text-red-300">PMS</span>
+                    <span class="px-4 py-2 glass-panel rounded-full border border-white/5">POS</span>
+                    <span class="px-4 py-2 glass-panel rounded-full border border-white/5">ERP</span>
+                    <span class="px-4 py-2 glass-panel rounded-full border border-white/5">CRM</span>
+                    <span class="px-4 py-2 glass-panel rounded-full border border-red-500/20 text-red-300">Email Threads</span>
+                    <span class="px-4 py-2 glass-panel rounded-full border border-white/5">WhatsApp</span>
+                    <span class="px-4 py-2 glass-panel rounded-full border border-red-500/20 text-red-300">Spreadsheets</span>
+                </div>
+            </div>
+            <p class="text-gray-400 font-light max-w-xl mx-auto text-sm pt-4">
+                Information exists everywhere. Execution is still disconnected — trapped in manual handoffs, delayed messages, and fragmented decisions.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-32 px-6 bg-charcoal/50 border-y border-white/5">
+        <div class="max-w-6xl mx-auto space-y-20">
+            <div class="text-center space-y-4">
+                <p class="text-xs font-mono text-laser uppercase tracking-widest">Operational Transformation</p>
+                <h2 class="text-3xl md:text-5xl font-light text-white">From disconnected work to connected execution.</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="glass-panel p-8 rounded-2xl border-l-2 border-red-500/50 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono text-red-400 uppercase tracking-wider">Legacy State</span>
+                        <span class="text-xs text-gray-500">Manual Operations</span>
+                    </div>
+                    <h3 class="text-xl font-medium text-white">Before OtonomiQ</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Signals are everywhere. Decisions are fragmented. Work moves manually across disconnected departments, slowing response times and increasing operational drag.
+                    </p>
+                    <ul class="space-y-3 text-xs font-mono text-gray-500 pt-4">
+                        <li class="flex items-center gap-2">✕ Fragmented context across 8+ tools</li>
+                        <li class="flex items-center gap-2">✕ Delayed guest request routing</li>
+                        <li class="flex items-center gap-2">✕ Uncoordinated procurement approvals</li>
+                    </ul>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl border-l-2 border-laser space-y-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-laser/5 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono text-laser uppercase tracking-wider">OtonomiQ OS</span>
+                        <span class="text-xs text-laser">Unified Execution</span>
+                    </div>
+                    <h3 class="text-xl font-medium text-white">With OtonomiQ</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Intelligence enters the workflow. Business context, AI agents, and people align around single operational missions with end-to-end verification.
+                    </p>
+                    <div class="pt-4 space-y-2 text-xs font-mono text-gray-300">
+                        <div class="flex justify-between items-center p-2 rounded bg-white/5 border border-white/5">
+                            <span>Signal</span> <span class="text-laser">→ Context Sensing</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded bg-white/5 border border-white/5">
+                            <span>Decision</span> <span class="text-laser">→ AI Analysis & Recommendation</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 rounded bg-white/5 border border-white/5">
+                            <span>Action</span> <span class="text-laser">→ Verified Human-in-Loop Execution</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 px-6">
+        <div class="max-w-5xl mx-auto text-center space-y-16">
+            <div class="space-y-4">
+                <h2 class="text-3xl md:text-5xl font-light text-white">One intelligence layer.<br/><span class="text-gray-500">Across the operation.</span></h2>
+                <p class="text-gray-400 text-sm max-w-lg mx-auto">OtonomiQ connects business context, AI agents, people, and workflows into one coordinated operating layer.</p>
+            </div>
+
+            <div class="p-8 glass-panel rounded-2xl border border-white/10 max-w-3xl mx-auto">
+                <div class="text-laser font-mono font-semibold text-lg tracking-widest mb-8">OTONOMIQ CORE LAYER</div>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="p-4 border border-white/10 rounded-lg bg-white/[0.02]">
+                        <span class="block text-xs font-mono text-gray-400 mb-1">FRONT OF HOUSE</span>
+                        <span class="text-sm font-medium text-white">GUEST</span>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded-lg bg-white/[0.02]">
+                        <span class="block text-xs font-mono text-gray-400 mb-1">COMMERCIAL</span>
+                        <span class="text-sm font-medium text-white">REVENUE</span>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded-lg bg-white/[0.02]">
+                        <span class="block text-xs font-mono text-gray-400 mb-1">BACK OF HOUSE</span>
+                        <span class="text-sm font-medium text-white">OPERATIONS</span>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded-lg bg-white/[0.02]">
+                        <span class="block text-xs font-mono text-gray-400 mb-1">SUPPLY CHAIN</span>
+                        <span class="text-sm font-medium text-white">PROCUREMENT</span>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded-lg bg-white/[0.02]">
+                        <span class="block text-xs font-mono text-gray-400 mb-1">CONTROL</span>
+                        <span class="text-sm font-medium text-white">FINANCE</span>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded-lg bg-white/[0.02]">
+                        <span class="block text-xs font-mono text-gray-400 mb-1">EXECUTIVE</span>
+                        <span class="text-sm font-medium text-white">MANAGEMENT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="hotel-os" class="py-32 px-6 bg-charcoal/30 border-t border-white/5">
+        <div class="max-w-6xl mx-auto space-y-16">
+            <div class="space-y-4">
+                <p class="text-xs font-mono text-laser uppercase tracking-widest">Modular Deployment</p>
+                <h2 class="text-3xl md:text-5xl font-light text-white">Meet the operating layer for hospitality.</h2>
+                <p class="text-gray-400 text-sm max-w-xl">Start with the workflow that matters most. Prove the value. Expand from there.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between hover:border-laser/30 transition-all duration-300">
+                    <div class="space-y-4">
+                        <span class="text-xs font-mono text-laser">01 — PROCUREMENT INTELLIGENCE</span>
+                        <h3 class="text-xl font-medium text-white">Turn purchasing signals into better decisions.</h3>
+                        <p class="text-xs text-gray-400 leading-relaxed">
+                            Detect requirements, compare supplier quotes, surface patterns, and route recommendations for approval automatically.
+                        </p>
+                    </div>
+                    <div class="pt-6 border-t border-white/5 font-mono text-[10px] text-gray-500 space-y-1">
+                        <div>Requirement → RFQ → Quotes</div>
+                        <div class="text-laser">→ Recommendation → Approval</div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between hover:border-laser/30 transition-all duration-300">
+                    <div class="space-y-4">
+                        <span class="text-xs font-mono text-laser">02 — REVENUE INTELLIGENCE</span>
+                        <h3 class="text-xl font-medium text-white">Turn demand signals into revenue action.</h3>
+                        <p class="text-xs text-gray-400 leading-relaxed">
+                            Detect booking pace and demand signals, analyze context, and recommend real-time pricing or inventory action.
+                        </p>
+                    </div>
+                    <div class="pt-6 border-t border-white/5 font-mono text-[10px] text-gray-500 space-y-1">
+                        <div>Demand Signal → Analysis</div>
+                        <div class="text-laser">→ Recommendation → Action</div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl space-y-6 flex flex-col justify-between hover:border-laser/30 transition-all duration-300">
+                    <div class="space-y-4">
+                        <span class="text-xs font-mono text-laser">03 — GUEST ENGAGEMENT</span>
+                        <h3 class="text-xl font-medium text-white">Turn guest requests into coordinated action.</h3>
+                        <p class="text-xs text-gray-400 leading-relaxed">
+                            Understand the request context, coordinate the right internal teams, confirm completion, and uncover upsell potential.
+                        </p>
+                    </div>
+                    <div class="pt-6 border-t border-white/5 font-mono text-[10px] text-gray-500 space-y-1">
+                        <div>Guest → Context → Departments</div>
+                        <div class="text-laser">→ Confirmation → Opportunity</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="live-mission" class="py-32 px-6">
+        <div class="max-w-5xl mx-auto space-y-12">
+            <div class="text-center space-y-4">
+                <p class="text-xs font-mono text-laser uppercase tracking-widest">Interactive Demonstration</p>
+                <h2 class="text-3xl md:text-5xl font-light text-white">Don't watch AI talk. <span class="text-laser font-normal">Watch it work.</span></h2>
+            </div>
+
+            <div class="glass-panel rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+                <div class="bg-white/5 px-6 py-4 border-b border-white/5 flex items-center justify-between text-xs font-mono">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-laser animate-ping"></span>
+                        <span class="text-white">ACTIVE MISSION: #M-8842</span>
+                    </div>
+                    <div class="text-gray-400">Context: Room 402 — VIP Tier II</div>
+                </div>
+
+                <div class="p-6 md:p-8 space-y-8 text-sm">
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+                            <span class="text-[10px] font-mono text-laser">1. SENSE</span>
+                            <div class="text-gray-300 font-mono text-xs">"Can I get a late checkout and book dinner for tonight?"</div>
+                            <div class="text-[10px] text-gray-500">Source: WhatsApp Guest Channel • 10:42:15</div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
+                            <span class="text-[10px] font-mono text-laser">2. UNDERSTAND</span>
+                            <div class="text-xs text-gray-300">
+                                Policy Check: Late checkout available ($0 for VIP).<br/>
+                                Restaurant Context: Table for 2 available at 20:00.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-xl bg-laser/5 border border-laser/30 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-mono text-laser font-semibold">3. DECIDE — RECOMMENDATION GENERATED</span>
+                            <span class="text-[10px] font-mono bg-laser/20 text-laser px-2 py-0.5 rounded">REQUIRES APPROVAL</span>
+                        </div>
+                        <p class="text-xs text-gray-300">
+                            Action Proposal: Grant 14:00 checkout + Reserve Table 4 at 20:00 (Preferred Dining Spot).
+                        </p>
+                        <div class="flex items-center gap-4 pt-2">
+                            <button onclick="this.innerText='APPROVED ✓'; this.classList.add('bg-green-500','text-black');" class="px-6 py-2 rounded bg-laser text-black font-mono text-xs font-bold transition-all">
+                                Approve Action
+                            </button>
+                            <span class="text-[10px] font-mono text-gray-400">Duty Manager: A. Vance (Active)</span>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 text-xs font-mono">
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                            <span class="text-[10px] text-laser">4. ACT (COORDINATED)</span>
+                            <div class="text-gray-400">• Housekeeping schedule updated</div>
+                            <div class="text-gray-400">• Table 4 locked in POS</div>
+                            <div class="text-gray-400">• Confirmation dispatched to guest</div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                            <span class="text-[10px] text-laser">5. VERIFY & LEARN</span>
+                            <div class="text-gray-400">✓ Mission Completed: 12 seconds total</div>
+                            <div class="text-gray-400">✓ Profile updated: Guest prefers Table 4</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="bg-white/5 px-6 py-3 border-t border-white/5 text-center text-xs font-mono text-gray-400">
+                    One request. Multiple systems. One coordinated workflow.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="py-32 px-6 border-t border-white/5">
+        <div class="max-w-5xl mx-auto space-y-16">
+            <div class="text-center space-y-4">
+                <p class="text-xs font-mono text-laser uppercase tracking-widest">Operating Architecture</p>
+                <h2 class="text-3xl md:text-5xl font-light text-white">The OtonomiQ Operating Loop</h2>
+            </div>
+
+            <div class="grid md:grid-cols-6 gap-4 text-center font-mono">
+                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
+                    <span class="block text-laser text-lg font-bold mb-2">01</span>
+                    <span class="text-xs text-white">SENSE</span>
+                </div>
+                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
+                    <span class="block text-laser text-lg font-bold mb-2">02</span>
+                    <span class="text-xs text-white">UNDERSTAND</span>
+                </div>
+                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
+                    <span class="block text-laser text-lg font-bold mb-2">03</span>
+                    <span class="text-xs text-white">DECIDE</span>
+                </div>
+                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
+                    <span class="block text-laser text-lg font-bold mb-2">04</span>
+                    <span class="text-xs text-white">ACT</span>
+                </div>
+                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
+                    <span class="block text-laser text-lg font-bold mb-2">05</span>
+                    <span class="text-xs text-white">VERIFY</span>
+                </div>
+                <div class="p-6 glass-panel rounded-xl border border-white/5 hover:border-laser transition-colors">
+                    <span class="block text-laser text-lg font-bold mb-2">06</span>
+                    <span class="text-xs text-white">LEARN</span>
+                </div>
+            </div>
+
+            <p class="text-center text-sm text-gray-400 max-w-xl mx-auto font-light">
+                Every mission follows the same operating logic — turning signals into decisions, decisions into actions, and actions into new intelligence.
+            </p>
+        </div>
+    </section>
+
+    <section id="trust" class="py-32 px-6 bg-charcoal/30 border-t border-white/5">
+        <div class="max-w-5xl mx-auto space-y-16">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <p class="text-xs font-mono text-laser uppercase tracking-widest">Enterprise Governance</p>
+                    <h2 class="text-3xl md:text-5xl font-light text-white leading-tight">
+                        AI moves work forward.<br/>
+                        <span class="text-laser font-normal">People stay in control.</span>
+                    </h2>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        OtonomiQ is not autonomous black-box AI. Every high-stakes operational decision features customizable approval thresholds and an immutable audit trail.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl border border-white/10 space-y-4 font-mono text-xs">
+                    <div class="text-gray-400 text-[10px] border-b border-white/5 pb-2">LIVE AUDIT LOG — MISSION #M-8842</div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-gray-400">
+                            <span>Recommendation generated</span>
+                            <span class="text-gray-500">10:42:16</span>
+                        </div>
+                        <div class="flex justify-between text-gray-400">
+                            <span>Context & rules evaluated</span>
+                            <span class="text-gray-500">10:42:17</span>
+                        </div>
+                        <div class="flex justify-between text-laser">
+                            <span>✓ Human Approval Granted (Manager)</span>
+                            <span class="text-laser">10:42:29</span>
+                        </div>
+                        <div class="flex justify-between text-gray-400">
+                            <span>Actions dispatched to systems</span>
+                            <span class="text-gray-500">10:42:31</span>
+                        </div>
+                        <div class="flex justify-between text-gray-400">
+                            <span>Audit record immutable log created</span>
+                            <span class="text-gray-500">10:42:32</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="impact" class="py-32 px-6 border-t border-white/5">
+        <div class="max-w-4xl mx-auto space-y-12">
+            <div class="text-center space-y-4">
+                <p class="text-xs font-mono text-laser uppercase tracking-widest">Financial & Operational Value</p>
+                <h2 class="text-3xl md:text-5xl font-light text-white">Intelligence is useful. Impact is measurable.</h2>
+                <p class="text-xs text-gray-500 font-mono">Simulated estimate for executive evaluation.</p>
+            </div>
+
+            <div class="glass-panel p-8 rounded-2xl border border-white/10 space-y-8">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <label class="block text-xs font-mono text-gray-400">Monthly Operational Workflows</label>
+                        <input type="range" min="1000" max="50000" value="15000" class="w-full accent-laser bg-white/10" oninput="document.getElementById('vol-val').innerText = parseInt(this.value).toLocaleString()">
+                        <div class="text-right text-xs font-mono text-laser" id="vol-val">15,000</div>
+                    </div>
+                    <div class="space-y-4">
+                        <label class="block text-xs font-mono text-gray-400">Avg. Manual Resolution Time (Mins)</label>
+                        <input type="range" min="2" max="30" value="12" class="w-full accent-laser bg-white/10" oninput="document.getElementById('time-val').innerText = this.value + ' mins'">
+                        <div class="text-right text-xs font-mono text-laser" id="time-val">12 mins</div>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-white/5 grid md:grid-cols-2 gap-6 text-center">
+                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                        <span class="block text-xs font-mono text-gray-400 mb-1">POTENTIAL TIME RECOVERED</span>
+                        <span class="text-2xl font-bold text-laser">~70%</span>
+                        <span class="block text-[10px] text-gray-500 mt-1">Reduction in manual handoffs</span>
+                    </div>
+                    <div class="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                        <span class="block text-xs font-mono text-gray-400 mb-1">ILLUSTRATIVE OPPORTUNITY</span>
+                        <span class="text-2xl font-bold text-white">High Impact</span>
+                        <span class="block text-[10px] text-gray-500 mt-1">Faster response + higher upsell capture</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="book" class="py-32 px-6 border-t border-white/5 bg-charcoal/50 text-center">
+        <div class="max-w-4xl mx-auto space-y-8">
+            <h2 class="text-3xl md:text-5xl font-light text-white">You don't need to transform everything at once.</h2>
+            <p class="text-xl text-laser font-normal">Start with what matters most. Prove it. Then expand.</p>
+
+            <div class="grid md:grid-cols-3 gap-4 pt-8 text-xs font-mono">
+                <div class="p-6 glass-panel rounded-xl border border-white/10">01. Procurement Pilot</div>
+                <div class="p-6 glass-panel rounded-xl border border-white/10">02. Revenue Intelligence</div>
+                <div class="p-6 glass-panel rounded-xl border border-white/10">03. Guest & Service Loop</div>
+            </div>
+
+            <div class="pt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="#" class="w-full sm:w-auto px-8 py-4 rounded-full bg-laser text-black font-semibold text-sm hover:shadow-[0_0_25px_rgba(0,242,254,0.5)] transition-all">
+                    Experience OtonomiQ
+                </a>
+                <a href="#" class="w-full sm:w-auto px-8 py-4 rounded-full glass-panel text-white font-medium text-sm hover:bg-white/10 transition-all">
+                    Discuss a Pilot
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 px-6 border-t border-white/5 text-center text-xs text-gray-600 font-mono">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>OTONOMIQ HOTEL OS — THE INTELLIGENCE & EXECUTION LAYER</div>
+            <div>Start with one workflow. Prove the value. Expand from there.</div>
+        </div>
+    </footer>
+
+</body>
+</html>
