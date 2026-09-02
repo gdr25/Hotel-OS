@@ -1,764 +1,991 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OtonomiQ Hotel OS — The AI-Native Hospitality Operating Layer</title>
+    <title>OtonomiQ — The AI Operating Layer for Hospitality</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        obsidian: '#090A0F',
-                        charcoal: '#12141D',
-                        cardBg: 'rgba(255, 255, 255, 0.03)',
-                        cardBorder: 'rgba(255, 255, 255, 0.08)',
-                        accentTeal: '#00F0FF',
-                        accentBlue: '#0066FF',
-                        coolGray: '#8E95A5',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        tealGlow: '0 0 25px rgba(0, 240, 255, 0.25)',
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
+
     <style>
+        /* --- CORE DESIGN SYSTEM --- */
+        :root {
+            --bg-base: #08090b;
+            --bg-surface: #0f1115;
+            --bg-surface-elevated: #161920;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(255, 255, 255, 0.18);
+            --text-main: #f3f4f6;
+            --text-muted: #8b929e;
+            --text-dark: #4b5563;
+            --accent: #00f2fe;
+            --accent-dim: rgba(0, 242, 254, 0.12);
+            --accent-glow: rgba(0, 242, 254, 0.35);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 24px;
+            --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
         body {
-            background-color: #090A0F;
-            color: #FFFFFF;
-            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
             overflow-x: hidden;
+            line-height: 1.5;
         }
+
+        /* Glassmorphism Classes */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(15, 17, 21, 0.75);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
         }
-        .glass-panel-active {
-            background: rgba(0, 240, 255, 0.03);
-            border-color: rgba(0, 240, 255, 0.3);
+
+        .glass-card {
+            background: rgba(22, 25, 32, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
         }
-        .animated-gradient-text {
-            background: linear-gradient(135deg, #FFFFFF 30%, #8E95A5 100%);
+
+        .glass-card:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-2px);
+        }
+
+        /* Global UI Controls */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            box-shadow: 0 0 30px var(--accent-glow);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-highlight);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-cyan { background: rgba(0, 242, 254, 0.15); color: var(--accent); border: 1px solid rgba(0, 242, 254, 0.3); }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        /* Navigation Bar */
+        header.app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(8, 9, 11, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-mark {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent), #0072ff);
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--text-main);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* --- SCREEN SECTIONS --- */
+        section.screen {
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 40px 40px;
+        }
+
+        /* 01: Hero Section */
+        #hero-screen {
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(0, 242, 254, 0.05) 0%, rgba(8, 9, 11, 1) 70%);
+        }
+
+        .hero-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-eyebrow {
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .hero-title {
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #A0AAB8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        .accent-gradient-text {
-            background: linear-gradient(135deg, #00F0FF 0%, #0066FF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-weight: 300;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        /* Custom UI node lines */
-        .node-line {
-            background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(0,240,255,0.5) 50%, rgba(255,255,255,0.05) 100%);
+
+        .hero-node-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
         }
+
+        .hero-node {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: pulse-node 4s infinite ease-in-out;
+        }
+
+        @keyframes pulse-node {
+            0%, 100% { border-color: var(--border); }
+            50% { border-color: rgba(0, 242, 254, 0.4); box-shadow: 0 0 15px rgba(0,242,254,0.1); }
+        }
+
+        /* 02: Platform Workspace (SaaS Environment) */
+        .workspace {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 24px;
+            min-height: 780px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 20px 16px;
+        }
+
+        .sidebar-category {
+            font-size: 11px;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 16px 0 8px 12px;
+            font-weight: 700;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-main);
+        }
+
+        .sidebar-item.active {
+            border-left: 3px solid var(--accent);
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .main-stage {
+            padding: 24px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow: hidden;
+        }
+
+        /* Guided Onboarding Banner */
+        .guided-banner {
+            background: linear-gradient(90deg, rgba(0, 242, 254, 0.1) 0%, rgba(15, 17, 21, 0.8) 100%);
+            border: 1px solid var(--accent-dim);
+            border-radius: var(--radius-sm);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Dashboards & Modules UI */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .metric-card {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .metric-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .metric-sub {
+            font-size: 12px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Interactive Walkthrough Modal Containers */
+        .walkthrough-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(8, 9, 11, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .walkthrough-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sim-container {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* Phone UI Simulator */
+        .phone-shell {
+            background: #000;
+            border: 8px solid #22252c;
+            border-radius: 36px;
+            padding: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            height: 520px;
+            position: relative;
+        }
+
+        .phone-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 12px;
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 4px;
+        }
+
+        .chat-bubble {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .chat-bubble.guest {
+            background: rgba(255, 255, 255, 0.1);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .chat-bubble.system {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        /* Flow Diagrams */
+        .flow-visualizer {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .flow-step {
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+        }
+
+        .flow-step.active {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        /* Interactive Architecture Ecosystem */
+        .eco-map {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .eco-center {
+            grid-column: span 3;
+            text-align: center;
+            padding: 30px;
+            border: 1px solid var(--accent);
+            background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%);
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+        }
+
+        /* Comparison Table */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            margin-top: 24px;
+        }
+
+        .comp-table th, .comp-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comp-table th {
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        /* System Integration Interactive Matrix */
+        .integration-stages {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stage-card {
+            padding: 24px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .stage-card.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        /* Helper Classes */
+        .hidden { display: none !important; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .text-accent { color: var(--accent); }
+        .text-muted { color: var(--text-muted); }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-6 { margin-bottom: 24px; }
+
     </style>
 </head>
-<body class="antialiased selection:bg-accentTeal selection:text-obsidian">
+<body>
 
-    <nav class="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/5 py-4 px-6 md:px-12 transition-all duration-300">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <span class="font-bold text-xl tracking-wider text-white">OTONOMIQ</span>
-                <span class="text-[10px] uppercase bg-accentTeal/10 text-accentTeal px-2 py-0.5 rounded font-mono border border-accentTeal/20">Hotel OS</span>
-            </div>
+    <header class="app-header">
+        <div class="logo-container">
+            <div class="logo-mark"><i data-lucide="layers" style="width:16px; height:16px; color:#000;"></i></div>
+            <span>OTONOMIQ</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#hero-screen" class="active">Overview</a></li>
+            <li><a href="#platform-screen">Platform</a></li>
+            <li><a href="#ecosystem-screen">Ecosystem</a></li>
+            <li><a href="#integration-screen">Integrations</a></li>
+            <li><a href="#impact-screen">Impact</a></li>
+        </ul>
+        <div class="nav-right">
+            <div class="badge badge-cyan"><span style="display:inline-block; width:6px; height:6px; background:var(--accent); border-radius:50%; margin-right:6px;"></span> ATM Dubai Stand AI01</div>
+            <button class="btn btn-primary" onclick="scrollToSection('platform-screen')">Explore Demo</button>
+        </div>
+    </header>
+
+    <section id="hero-screen" class="screen">
+        <svg class="hero-canvas" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0,20 Q50,5 100,20 T100,80 Q50,95 0,80 Z" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+            <line x1="20" y1="0" x2="20" y2="100" stroke="rgba(255,255,255,0.02)" stroke-width="0.3"/>
+            <line x1="50" y1="0" x2="50" y2="100" stroke="rgba(255,255,255,0.02)" stroke-width="0.3"/>
+            <line x1="80" y1="0" x2="80" y2="100" stroke="rgba(255,255,255,0.02)" stroke-width="0.3"/>
+        </svg>
+
+        <div class="hero-content">
+            <div class="hero-eyebrow">Your hotel is already running. But who connects it all?</div>
+            <h1 class="hero-title">Meet OtonomiQ. The AI Operating Layer for Modern Hotels.</h1>
+            <p class="hero-subtitle">Unifying guests, staff, operational workflows, and legacy PMS/POS systems into a single real-time execution engine.</p>
             
-            <div class="hidden md:flex items-center gap-8 text-sm text-coolGray font-medium">
-                <a href="#platform" class="hover:text-white transition-colors">Platform</a>
-                <a href="#hotel-os" class="hover:text-white transition-colors">Hotel OS</a>
-                <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
-                <a href="#experience" class="hover:text-white transition-colors">Experience</a>
+            <div class="hero-node-container">
+                <div class="hero-node"><i data-lucide="users" style="width:14px;"></i> Guests</div>
+                <div class="hero-node"><i data-lucide="user-check" style="width:14px;"></i> Staff</div>
+                <div class="hero-node"><i data-lucide="database" style="width:14px;"></i> PMS</div>
+                <div class="hero-node"><i data-lucide="credit-card" style="width:14px;"></i> POS</div>
+                <div class="hero-node"><i data-lucide="message-square" style="width:14px;"></i> WhatsApp</div>
+                <div class="hero-node"><i data-lucide="activity" style="width:14px;"></i> Operations</div>
+                <div class="hero-node"><i data-lucide="trending-up" style="width:14px;"></i> Revenue</div>
             </div>
 
-            <div class="flex items-center gap-4">
-                <a href="#demo" class="hidden sm:inline-block text-sm text-white hover:text-coolGray transition-colors">Book a Pilot</a>
-                <a href="#experience" class="bg-accentTeal/10 hover:bg-accentTeal/20 text-accentTeal border border-accentTeal/30 px-4 py-2 rounded-md text-sm font-medium transition-all shadow-tealGlow">
-                    Experience Hotel OS →
-                </a>
-            </div>
-        </div>
-    </nav>
-
-    <section class="relative pt-32 pb-20 md:pt-44 md:pb-32 px-6 max-w-7xl mx-auto">
-        <div class="text-center max-w-4xl mx-auto mb-16">
-            <span class="inline-block text-xs font-semibold uppercase tracking-widest text-accentTeal bg-accentTeal/5 px-3 py-1 rounded-full border border-accentTeal/20 mb-6">
-                OTONOMIQ HOTEL OS
-            </span>
-            <h1 class="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight leading-tight mb-6">
-                Your hotel has systems.<br/>
-                <span class="accent-gradient-text">Your hotel needs an operating layer.</span>
-            </h1>
-            <p class="text-lg md:text-xl text-coolGray max-w-2xl mx-auto leading-relaxed mb-8">
-                OtonomiQ connects your hotel's systems, people, and workflows into one intelligent operating layer — helping teams understand what is happening, decide what to do, and execute faster.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="#experience" class="w-full sm:w-auto bg-white text-obsidian font-semibold px-8 py-4 rounded-md hover:bg-gray-200 transition-all text-sm">
-                    Experience Hotel OS →
-                </a>
-                <a href="#how-it-works" class="w-full sm:w-auto glass-panel border border-cardBorder text-white font-medium px-8 py-4 rounded-md hover:border-white/20 transition-all text-sm">
-                    See How It Works
-                </a>
+            <div style="display:flex; gap:16px; justify-content:center;">
+                <button class="btn btn-primary" onclick="enterExperience()">Enter the Experience →</button>
+                <button class="btn btn-secondary" onclick="scrollToSection('ecosystem-screen')">Watch How It Works ↓</button>
             </div>
         </div>
+    </section>
 
-        <div class="relative w-full max-w-5xl mx-auto glass-panel rounded-2xl p-6 md:p-8 border border-cardBorder overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-b from-accentTeal/5 to-transparent pointer-events-none"></div>
+    <section id="platform-screen" class="screen" style="padding-top:120px; justify-content:flex-start;">
+        <div class="workspace glass-panel">
             
-            <div class="text-xs font-mono text-coolGray mb-4 flex justify-between items-center border-b border-white/5 pb-3">
-                <span>LIVE OPERATIONAL CONTEXT LAYER</span>
-                <span class="text-accentTeal flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-accentTeal animate-pulse"></span> SYSTEM SYNCHRONIZED
-                </span>
+            <div class="sidebar" style="border-right: 1px solid var(--border);">
+                <div class="sidebar-category">Operations Dashboard</div>
+                <div class="sidebar-item active" onclick="switchTab('overview')"><i data-lucide="layout-dashboard" style="width:16px;"></i> Overview</div>
+                <div class="sidebar-item" onclick="switchTab('guest-intel')"><i data-lucide="message-square" style="width:16px;"></i> Guest Intelligence</div>
+                <div class="sidebar-item" onclick="switchTab('ops-center')"><i data-lucide="check-square" style="width:16px;"></i> Operations</div>
+                <div class="sidebar-item" onclick="switchTab('revenue-intel')"><i data-lucide="trending-up" style="width:16px;"></i> Revenue</div>
+                <div class="sidebar-item" onclick="switchTab('fb-intel')"><i data-lucide="utensils" style="width:16px;"></i> F&B</div>
+                
+                <div class="sidebar-category">Autonomous Agents</div>
+                <div class="sidebar-item" onclick="switchTab('ai-workforce')"><i data-lucide="bot" style="width:16px;"></i> AI Workforce</div>
+                <div class="sidebar-item" onclick="switchTab('copilot')"><i data-lucide="sparkles" style="width:16px;"></i> AI Co-Pilot</div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="glass-panel p-4 rounded-lg border border-white/5 text-left">
-                    <span class="text-[10px] text-coolGray block mb-1">GUEST CHANNEL</span>
-                    <p class="text-xs font-medium text-white truncate">WhatsApp: Late Checkout Request</p>
-                    <span class="text-[10px] text-accentTeal mt-2 inline-block">Active Signal</span>
-                </div>
-                <div class="glass-panel p-4 rounded-lg border border-white/5 text-left">
-                    <span class="text-[10px] text-coolGray block mb-1">REVENUE MANAGEMENT</span>
-                    <p class="text-xs font-medium text-white truncate">Demand Spike: Suite 402</p>
-                    <span class="text-[10px] text-accentTeal mt-2 inline-block">Yield Opportunity</span>
-                </div>
-                <div class="glass-panel p-4 rounded-lg border border-white/5 text-left">
-                    <span class="text-[10px] text-coolGray block mb-1">PROCUREMENT</span>
-                    <p class="text-xs font-medium text-white truncate">F&B Inventory Threshold Met</p>
-                    <span class="text-[10px] text-coolGray mt-2 inline-block">Pending Review</span>
-                </div>
-                <div class="glass-panel p-4 rounded-lg border border-white/5 text-left">
-                    <span class="text-[10px] text-coolGray block mb-1">STAFF DISPATCH</span>
-                    <p class="text-xs font-medium text-white truncate">Housekeeping Priority #12</p>
-                    <span class="text-[10px] text-accentTeal mt-2 inline-block">Auto-Assigned</span>
-                </div>
-            </div>
-
-            <div class="relative py-6 border border-accentTeal/20 bg-accentTeal/5 rounded-xl text-center">
-                <p class="text-xs font-mono uppercase tracking-widest text-accentTeal font-semibold">OTONOMIQ CENTRAL INTELLIGENCE LAYER</p>
-                <p class="text-sm text-coolGray mt-1">Cross-system contextual synthesis, agent orchestration & human verification.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="border-y border-white/5 py-8 bg-charcoal/50">
-        <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-around items-center gap-6 text-xs md:text-sm font-mono tracking-widest text-coolGray">
-            <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 bg-accentTeal rounded-full"></span> AI-NATIVE
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 bg-accentTeal rounded-full"></span> HUMAN-CONTROLLED
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 bg-accentTeal rounded-full"></span> HOSPITALITY-FIRST
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-1.5 h-1.5 bg-accentTeal rounded-full"></span> BUILT TO EXECUTE
-            </div>
-        </div>
-    </section>
-
-    <section id="platform" class="py-24 px-6 max-w-7xl mx-auto">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-            <h2 class="text-3xl md:text-5xl font-semibold mb-6">
-                Hospitality has no shortage of systems.<br/>
-                <span class="text-coolGray">It has a shortage of coordination.</span>
-            </h2>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-8 items-stretch">
-            <div class="glass-panel rounded-2xl p-8 border border-white/5 flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between mb-8">
-                        <span class="text-xs font-mono tracking-widest text-red-400 uppercase">BEFORE OTONOMIQ</span>
-                        <span class="text-xs text-coolGray">Fragmented Stack</span>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-3 mb-8 text-center text-xs font-mono">
-                        <div class="bg-white/5 p-3 rounded border border-white/5 text-coolGray">PMS</div>
-                        <div class="bg-white/5 p-3 rounded border border-white/5 text-coolGray">POS</div>
-                        <div class="bg-white/5 p-3 rounded border border-white/5 text-coolGray">CRM</div>
-                        <div class="bg-white/5 p-3 rounded border border-white/5 text-coolGray">OTA</div>
-                        <div class="bg-white/5 p-3 rounded border border-white/5 text-coolGray">ERP</div>
-                        <div class="bg-white/5 p-3 rounded border border-white/5 text-coolGray">WhatsApp</div>
-                    </div>
-                </div>
-
-                <ul class="space-y-3 text-sm text-coolGray border-t border-white/5 pt-6">
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-400">✕</span> Information is scattered across isolated databases.
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-400">✕</span> Decisions happen manually through slow communication chains.
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-400">✕</span> Execution depends on staff manually connecting the dots.
-                    </li>
-                </ul>
-            </div>
-
-            <div class="glass-panel rounded-2xl p-8 border border-accentTeal/30 bg-accentTeal/5 flex flex-col justify-between shadow-tealGlow">
-                <div>
-                    <div class="flex items-center justify-between mb-8">
-                        <span class="text-xs font-mono tracking-widest text-accentTeal uppercase">AFTER OTONOMIQ</span>
-                        <span class="text-xs text-accentTeal font-medium">Unified Orchestration</span>
-                    </div>
-
-                    <div class="relative p-6 rounded-xl border border-accentTeal/30 bg-black/40 text-center mb-8">
-                        <span class="text-xs font-mono text-accentTeal uppercase tracking-widest block mb-2">OTONOMIQ HOTEL OS</span>
-                        <div class="grid grid-cols-3 gap-2 text-[11px] text-white">
-                            <span>Guest</span>
-                            <span>Revenue</span>
-                            <span>Ops</span>
-                            <span>Procurement</span>
-                            <span>Finance</span>
-                            <span>Management</span>
+            <div class="main-stage">
+                
+                <div id="guided-prompt" class="guided-banner">
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <div style="width:40px; height:40px; border-radius:50%; background:var(--accent-dim); display:grid; place-items:center;">
+                            <i data-lucide="play" style="color:var(--accent); width:20px;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:600; font-size:14px;">Let's see OtonomiQ in action</div>
+                            <div style="font-size:12px; color:var(--text-muted);">Simulate an incoming guest request and experience automated workflow execution.</div>
                         </div>
                     </div>
+                    <div style="display:flex; gap:12px;">
+                        <button class="btn btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="dismissPrompt()">Skip Guided Tour</button>
+                        <button class="btn btn-primary" style="padding:6px 16px; font-size:12px;" onclick="startSimulation()">Try It →</button>
+                    </div>
                 </div>
 
-                <ul class="space-y-3 text-sm text-white border-t border-accentTeal/20 pt-6">
-                    <li class="flex items-start gap-2">
-                        <span class="text-accentTeal">✓</span> Context comes together instantly into one intelligence layer.
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-accentTeal">✓</span> AI agents understand context and propose optimized actions.
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-accentTeal">✓</span> People approve decisions while workflows execute automatically.
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-20 px-6 max-w-7xl mx-auto border-t border-white/5">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-            <h2 class="text-3xl md:text-5xl font-semibold mb-4">
-                From systems of record<br/>
-                <span class="accent-gradient-text">to systems of action.</span>
-            </h2>
-            <p class="text-coolGray text-base md:text-lg">
-                Traditional hotel software records bookings, transactions, tickets, and financial activity. OtonomiQ adds an intelligence and execution layer that understands what is happening and coordinates what happens next.
-            </p>
-        </div>
-
-        <div class="max-w-4xl mx-auto space-y-4">
-            <div class="glass-panel p-6 rounded-xl text-center border-white/10">
-                <span class="text-xs font-mono uppercase text-coolGray tracking-widest block mb-3">HOTEL SYSTEMS OF RECORD</span>
-                <div class="flex flex-wrap justify-center gap-3 text-xs text-white">
-                    <span class="bg-white/5 px-4 py-2 rounded">PMS</span>
-                    <span class="bg-white/5 px-4 py-2 rounded">POS</span>
-                    <span class="bg-white/5 px-4 py-2 rounded">ERP</span>
-                    <span class="bg-white/5 px-4 py-2 rounded">CRM</span>
-                    <span class="bg-white/5 px-4 py-2 rounded">OTAs</span>
-                    <span class="bg-white/5 px-4 py-2 rounded">Guest Channels</span>
-                </div>
-            </div>
-
-            <div class="text-center text-accentTeal text-xl">↓</div>
-
-            <div class="glass-panel p-8 rounded-xl text-center border-accentTeal/40 bg-accentTeal/5 relative shadow-tealGlow">
-                <span class="text-sm font-mono uppercase text-accentTeal font-bold tracking-widest block mb-3">OTONOMIQ INTELLIGENCE LAYER</span>
-                <div class="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs font-mono text-white">
-                    <div class="p-2 border border-accentTeal/20 rounded">Context</div>
-                    <div class="p-2 border border-accentTeal/20 rounded">Knowledge</div>
-                    <div class="p-2 border border-accentTeal/20 rounded">AI Agents</div>
-                    <div class="p-2 border border-accentTeal/20 rounded">Orchestration</div>
-                    <div class="p-2 border border-accentTeal/20 rounded">Workflows</div>
-                    <div class="p-2 border border-accentTeal/20 rounded">Approvals</div>
-                </div>
-            </div>
-
-            <div class="text-center text-accentTeal text-xl">↓</div>
-
-            <div class="glass-panel p-6 rounded-xl text-center border-white/10">
-                <span class="text-xs font-mono uppercase text-coolGray tracking-widest block mb-3">COORDINATED HOSPITALITY EXECUTION</span>
-                <div class="flex flex-wrap justify-center gap-3 text-xs text-white">
-                    <span class="bg-white/5 px-4 py-2 rounded border border-white/5">Guest Experience</span>
-                    <span class="bg-white/5 px-4 py-2 rounded border border-white/5">Revenue Management</span>
-                    <span class="bg-white/5 px-4 py-2 rounded border border-white/5">Hotel Operations</span>
-                    <span class="bg-white/5 px-4 py-2 rounded border border-white/5">Procurement</span>
-                    <span class="bg-white/5 px-4 py-2 rounded border border-white/5">Finance & Governance</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="hotel-os" class="py-24 px-6 max-w-7xl mx-auto border-t border-white/5">
-        <div class="mb-16">
-            <h2 class="text-3xl md:text-4xl font-semibold mb-3">One operating layer.</h2>
-            <p class="text-coolGray text-lg">Every workflow can connect.</p>
-        </div>
-
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="glass-panel p-6 rounded-xl hover:border-accentTeal/40 transition-all">
-                <div class="text-accentTeal text-xs font-mono mb-2">01 / DISPATCH & CARE</div>
-                <h3 class="text-xl font-medium mb-2">Guest & Service</h3>
-                <p class="text-coolGray text-sm">Coordinate guest requests, messaging channels, and operational service workflows in real time.</p>
-            </div>
-            <div class="glass-panel p-6 rounded-xl hover:border-accentTeal/40 transition-all">
-                <div class="text-accentTeal text-xs font-mono mb-2">02 / YIELD & DEMAND</div>
-                <h3 class="text-xl font-medium mb-2">Revenue</h3>
-                <p class="text-coolGray text-sm">Turn real-time market demand signals into immediate revenue and upsell decisions.</p>
-            </div>
-            <div class="glass-panel p-6 rounded-xl hover:border-accentTeal/40 transition-all">
-                <div class="text-accentTeal text-xs font-mono mb-2">03 / TASK ORCHESTRATION</div>
-                <h3 class="text-xl font-medium mb-2">Operations</h3>
-                <p class="text-coolGray text-sm">Synchronize staff, schedules, housekeeping prioritization, and task execution effortlessly.</p>
-            </div>
-            <div class="glass-panel p-6 rounded-xl hover:border-accentTeal/40 transition-all">
-                <div class="text-accentTeal text-xs font-mono mb-2">04 / SUPPLY CHAIN</div>
-                <h3 class="text-xl font-medium mb-2">Procurement</h3>
-                <p class="text-coolGray text-sm">Make purchasing workflows, stock triggers, and vendor quotes faster and transparent.</p>
-            </div>
-            <div class="glass-panel p-6 rounded-xl hover:border-accentTeal/40 transition-all">
-                <div class="text-accentTeal text-xs font-mono mb-2">05 / AUDIT & CONTROL</div>
-                <h3 class="text-xl font-medium mb-2">Finance</h3>
-                <p class="text-coolGray text-sm">Connect daily operational activities directly with transparent financial visibility and budgets.</p>
-            </div>
-            <div class="glass-panel p-6 rounded-xl hover:border-accentTeal/40 transition-all">
-                <div class="text-accentTeal text-xs font-mono mb-2">06 / GROUP INSIGHT</div>
-                <h3 class="text-xl font-medium mb-2">Management</h3>
-                <p class="text-coolGray text-sm">Turn property-level operational data into clear strategic insight for corporate leadership.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="experience" class="py-24 px-6 max-w-7xl mx-auto border-t border-white/5">
-        <div class="max-w-3xl mb-12">
-            <span class="text-xs font-mono text-accentTeal uppercase tracking-widest block mb-2">INTERACTIVE DEMONSTRATION</span>
-            <h2 class="text-3xl md:text-5xl font-semibold mb-4">
-                Don't watch a demo.<br/>
-                <span class="accent-gradient-text">Watch work get done.</span>
-            </h2>
-            <p class="text-coolGray text-base">Experience how OtonomiQ senses a signal, understands context, recommends an action, and coordinates execution.</p>
-        </div>
-
-        <div class="flex flex-wrap gap-4 mb-8">
-            <button class="glass-panel glass-panel-active text-white px-5 py-3 rounded-lg text-sm font-medium border border-accentTeal/30">
-                Guest & Service Demo
-            </button>
-            <button class="glass-panel text-coolGray px-5 py-3 rounded-lg text-sm font-medium hover:text-white transition-all cursor-not-allowed opacity-60">
-                Revenue Intelligence (Coming Soon)
-            </button>
-            <button class="glass-panel text-coolGray px-5 py-3 rounded-lg text-sm font-medium hover:text-white transition-all cursor-not-allowed opacity-60">
-                Procurement Intelligence (Coming Soon)
-            </button>
-        </div>
-
-        <div class="glass-panel rounded-2xl border border-white/10 p-6 md:p-8">
-            <div class="mb-8 p-4 rounded-lg bg-white/5 border border-white/10 flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-mono text-accentTeal uppercase tracking-wider block">INCOMING GUEST SIGNAL</span>
-                    <p class="text-sm font-medium text-white mt-1">WhatsApp Message: "Can I get a late checkout tomorrow and book dinner for 8 PM?"</p>
-                </div>
-                <span class="text-xs text-coolGray font-mono">Room 504</span>
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-8">
-                <div id="step-1" class="glass-panel p-3 rounded-lg border-accentTeal/40 bg-accentTeal/10 text-accentTeal transition-all text-xs font-mono">
-                    01 — SENSE
-                </div>
-                <div id="step-2" class="glass-panel p-3 rounded-lg border-white/5 text-coolGray transition-all text-xs font-mono">
-                    02 — UNDERSTAND
-                </div>
-                <div id="step-3" class="glass-panel p-3 rounded-lg border-white/5 text-coolGray transition-all text-xs font-mono">
-                    03 — DECIDE
-                </div>
-                <div id="step-4" class="glass-panel p-3 rounded-lg border-white/5 text-coolGray transition-all text-xs font-mono">
-                    04 — ACT
-                </div>
-                <div id="step-5" class="glass-panel p-3 rounded-lg border-white/5 text-coolGray transition-all text-xs font-mono">
-                    05 — VERIFY
-                </div>
-                <div id="step-6" class="glass-panel p-3 rounded-lg border-white/5 text-coolGray transition-all text-xs font-mono">
-                    06 — LEARN
-                </div>
-            </div>
-
-            <div id="workflow-stage-content" class="min-h-[220px] p-6 rounded-xl bg-black/40 border border-white/5 flex flex-col justify-between">
-                <div>
-                    <span class="text-xs font-mono text-coolGray uppercase tracking-wider block mb-2">STAGE DETAIL</span>
-                    <h4 id="stage-title" class="text-lg font-semibold text-white mb-2">01 — Request Detected</h4>
-                    <p id="stage-description" class="text-sm text-coolGray">OtonomiQ natural language processing parses multi-intent guest inquiry from WhatsApp stream.</p>
-                </div>
-
-                <div class="mt-6 flex justify-between items-center border-t border-white/5 pt-4">
-                    <span id="stage-status" class="text-xs font-mono text-accentTeal">Signal Parsed: Intent Identified</span>
-                    <button id="next-stage-btn" onclick="advanceWorkflow()" class="bg-accentTeal text-obsidian px-5 py-2 rounded font-semibold text-xs hover:bg-white transition-all">
-                        Advance Stage →
-                    </button>
-                </div>
-            </div>
-
-            <div class="mt-6 text-center text-xs font-mono text-coolGray">
-                One guest request. Multiple coordinated actions.
-            </div>
-        </div>
-    </section>
-
-    <section class="py-24 px-6 max-w-7xl mx-auto border-t border-white/5">
-        <div class="text-center max-w-2xl mx-auto mb-16">
-            <span class="text-xs font-mono text-accentTeal uppercase tracking-widest block mb-2">THE OTONOMIQ PARADIGM</span>
-            <h2 class="text-3xl md:text-5xl font-semibold mb-4">This is how OtonomiQ operates.</h2>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-accentTeal/40 transition-all">
-                <span class="text-xs font-mono text-accentTeal block mb-2">01. SENSE</span>
-                <h3 class="font-medium text-white mb-1">Signal Trigger</h3>
-                <p class="text-xs text-coolGray">Guest request or operational threshold detected in real time.</p>
-            </div>
-
-            <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-accentTeal/40 transition-all">
-                <span class="text-xs font-mono text-accentTeal block mb-2">02. UNDERSTAND</span>
-                <h3 class="font-medium text-white mb-1">Context Synthesis</h3>
-                <p class="text-xs text-coolGray">Retrieves policy, PMS booking data, staff load, and inventory context.</p>
-            </div>
-
-            <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-accentTeal/40 transition-all">
-                <span class="text-xs font-mono text-accentTeal block mb-2">03. DECIDE</span>
-                <h3 class="font-medium text-white mb-1">AI Recommendation</h3>
-                <p class="text-xs text-coolGray">Proposes optimal, rule-compliant operational action choices.</p>
-            </div>
-
-            <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-accentTeal/40 transition-all">
-                <span class="text-xs font-mono text-accentTeal block mb-2">04. ACT</span>
-                <h3 class="font-medium text-white mb-1">Workflow Dispatch</h3>
-                <p class="text-xs text-coolGray">Executes cross-system tasks simultaneously to relevant staff.</p>
-            </div>
-
-            <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-accentTeal/40 transition-all">
-                <span class="text-xs font-mono text-accentTeal block mb-2">05. VERIFY</span>
-                <h3 class="font-medium text-white mb-1">Human Governance</h3>
-                <p class="text-xs text-coolGray">Manager approves commitment decisions with full audit logs.</p>
-            </div>
-
-            <div class="glass-panel p-5 rounded-xl border border-white/5 hover:border-accentTeal/40 transition-all">
-                <span class="text-xs font-mono text-accentTeal block mb-2">06. LEARN</span>
-                <h3 class="font-medium text-white mb-1">Memory Capture</h3>
-                <p class="text-xs text-coolGray">Updates guest preferences and operational efficiency benchmarks.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-24 px-6 max-w-7xl mx-auto border-t border-white/5">
-        <div class="mb-16">
-            <h2 class="text-3xl md:text-5xl font-semibold mb-3">Intelligence that works across the hotel.</h2>
-        </div>
-
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="glass-panel p-8 rounded-2xl border border-white/5">
-                <div class="w-8 h-8 rounded bg-accentTeal/10 text-accentTeal flex items-center justify-center font-mono text-xs mb-6">01</div>
-                <h3 class="text-xl font-medium mb-3">AI Agents</h3>
-                <p class="text-sm text-coolGray leading-relaxed">Understand business context and coordinate operational work across departments without manual handoffs.</p>
-            </div>
-
-            <div class="glass-panel p-8 rounded-2xl border border-white/5">
-                <div class="w-8 h-8 rounded bg-accentTeal/10 text-accentTeal flex items-center justify-center font-mono text-xs mb-6">02</div>
-                <h3 class="text-xl font-medium mb-3">Workflow Orchestration</h3>
-                <p class="text-sm text-coolGray leading-relaxed">Connect people, existing software systems, and real-world actions into one continuous execution flow.</p>
-            </div>
-
-            <div class="glass-panel p-8 rounded-2xl border border-white/5">
-                <div class="w-8 h-8 rounded bg-accentTeal/10 text-accentTeal flex items-center justify-center font-mono text-xs mb-6">03</div>
-                <h3 class="text-xl font-medium mb-3">Guest Intelligence</h3>
-                <p class="text-sm text-coolGray leading-relaxed">Respond, assist, and coordinate complex multi-step guest requests across any messaging channel.</p>
-            </div>
-
-            <div class="glass-panel p-8 rounded-2xl border border-white/5">
-                <div class="w-8 h-8 rounded bg-accentTeal/10 text-accentTeal flex items-center justify-center font-mono text-xs mb-6">04</div>
-                <h3 class="text-xl font-medium mb-3">Revenue Intelligence</h3>
-                <p class="text-sm text-coolGray leading-relaxed">Surface hidden demand signals, rate discrepancies, and real-time upsell opportunities to commercial teams.</p>
-            </div>
-
-            <div class="glass-panel p-8 rounded-2xl border border-white/5">
-                <div class="w-8 h-8 rounded bg-accentTeal/10 text-accentTeal flex items-center justify-center font-mono text-xs mb-6">05</div>
-                <h3 class="text-xl font-medium mb-3">Procurement Intelligence</h3>
-                <p class="text-sm text-coolGray leading-relaxed">Bring inventory requirements, vendor quotes, recommendations, and approvals together transparently.</p>
-            </div>
-
-            <div class="glass-panel p-8 rounded-2xl border border-white/5">
-                <div class="w-8 h-8 rounded bg-accentTeal/10 text-accentTeal flex items-center justify-center font-mono text-xs mb-6">06</div>
-                <h3 class="text-xl font-medium mb-3">Human Control</h3>
-                <p class="text-sm text-coolGray leading-relaxed">Keep hotel managers in complete control of financial approvals and high-stakes guest commitments.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-24 px-6 max-w-7xl mx-auto border-t border-white/5">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-                <span class="text-xs font-mono text-accentTeal uppercase tracking-widest block mb-2">IMPACT MODELER</span>
-                <h2 class="text-3xl md:text-5xl font-semibold mb-6">From activity to measurable impact.</h2>
-                <p class="text-coolGray text-sm md:text-base mb-8 leading-relaxed">
-                    Estimate efficiency gains by shifting routine coordination and system synchronization to the OtonomiQ intelligence layer.
-                </p>
-
-                <div class="space-y-6">
+                <div class="flex-between">
                     <div>
-                        <div class="flex justify-between text-xs font-mono text-coolGray mb-2">
-                            <span>MONTHLY GUEST REQUEST VOLUME</span>
-                            <span id="vol-val" class="text-white">5,000</span>
+                        <h2 style="font-size: 22px; font-weight:600;">Good Morning, The Grand Hotel</h2>
+                        <p class="text-muted" style="font-size: 13px;">Real-time execution matrix and intelligent task delegation.</p>
+                    </div>
+                    <div class="badge badge-green"><i data-lucide="activity" style="width:12px; margin-right:4px;"></i> Live Operational Engine</div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="glass-card metric-card">
+                        <span class="metric-title">Guest Conversations</span>
+                        <span class="metric-value">126</span>
+                        <span class="metric-sub"><i data-lucide="arrow-up-right" style="width:14px;"></i> 98% via WhatsApp</span>
+                    </div>
+                    <div class="glass-card metric-card">
+                        <span class="metric-title">Active Requests</span>
+                        <span class="metric-value" style="color:var(--warning)">24</span>
+                        <span class="metric-sub" style="color:var(--text-muted)">Avg SLA: 12 min</span>
+                    </div>
+                    <div class="glass-card metric-card">
+                        <span class="metric-title">AI Resolved</span>
+                        <span class="metric-value" style="color:var(--accent)">94</span>
+                        <span class="metric-sub"><i data-lucide="check" style="width:14px;"></i> Zero Front Desk Touch</span>
+                    </div>
+                    <div class="glass-card metric-card">
+                        <span class="metric-title">Revenue Opportunities</span>
+                        <span class="metric-value" style="color:var(--success)">18</span>
+                        <span class="metric-sub"><i data-lucide="trending-up" style="width:14px;"></i> ₹42,500 Potential</span>
+                    </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px; flex:1;">
+                    <div class="glass-card" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+                        <div class="flex-between">
+                            <span style="font-weight:600; font-size:14px;">Live Operations Feed</span>
+                            <span class="text-muted" style="font-size:12px;">Automated SLA Dispatch</span>
                         </div>
-                        <input id="vol-slider" type="range" min="1000" max="25000" step="500" value="5000" class="w-full accent-accentTeal bg-white/10 rounded h-1 cursor-pointer" oninput="calculateImpact()">
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between text-xs font-mono text-coolGray mb-2">
-                            <span>AVG MANUAL WORKFLOW RESPONSE (MINS)</span>
-                            <span id="time-val" class="text-white">18</span>
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <div class="flex-between" style="padding:12px; background:rgba(255,255,255,0.02); border-radius:6px; border-left:3px solid var(--danger);">
+                                <div>
+                                    <div style="font-size:13px; font-weight:600;">🔴 High Priority — Room 821</div>
+                                    <div style="font-size:12px; color:var(--text-muted);">AC Malfunction • Guest waiting: 8 min</div>
+                                </div>
+                                <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="triggerEscalation()">Escalate Task</button>
+                            </div>
+                            <div class="flex-between" style="padding:12px; background:rgba(255,255,255,0.02); border-radius:6px; border-left:3px solid var(--warning);">
+                                <div>
+                                    <div style="font-size:13px; font-weight:600;">🟡 Housekeeping — Room 508</div>
+                                    <div style="font-size:12px; color:var(--text-muted);">2 Extra Towels requested via WhatsApp</div>
+                                </div>
+                                <span class="badge badge-amber">In Progress</span>
+                            </div>
+                            <div class="flex-between" style="padding:12px; background:rgba(255,255,255,0.02); border-radius:6px; border-left:3px solid var(--success);">
+                                <div>
+                                    <div style="font-size:13px; font-weight:600;">🟢 Maintenance — Room 214</div>
+                                    <div style="font-size:12px; color:var(--text-muted);">TV Calibration completed</div>
+                                </div>
+                                <span class="badge badge-green">Resolved</span>
+                            </div>
                         </div>
-                        <input id="time-slider" type="range" min="5" max="60" step="1" value="18" class="w-full accent-accentTeal bg-white/10 rounded h-1 cursor-pointer" oninput="calculateImpact()">
                     </div>
-                </div>
-            </div>
 
-            <div class="glass-panel p-8 rounded-2xl border border-accentTeal/30 bg-accentTeal/5 shadow-tealGlow">
-                <h3 class="text-xs font-mono text-accentTeal uppercase tracking-widest mb-6">PROJECTED OPERATIONAL EFFICIENCY</h3>
-
-                <div class="grid grid-cols-2 gap-6 mb-8">
-                    <div>
-                        <span class="text-xs text-coolGray block mb-1">Estimated Hours Saved / Mo</span>
-                        <span id="hours-saved" class="text-3xl md:text-4xl font-semibold text-white">1,050</span>
-                    </div>
-                    <div>
-                        <span class="text-xs text-coolGray block mb-1">Response Acceleration</span>
-                        <span id="speedup" class="text-3xl md:text-4xl font-semibold text-accentTeal">4.5x</span>
+                    <div class="glass-card" style="padding:20px; display:flex; flex-direction:column; justify-content:space-between;">
+                        <div>
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                                <i data-lucide="sparkles" style="color:var(--accent); width:18px;"></i>
+                                <span style="font-weight:600; font-size:14px;">AI Co-Pilot Suggestion</span>
+                            </div>
+                            <p style="font-size:13px; color:var(--text-muted); line-height:1.4;">
+                                3 high-probability upsell opportunities detected for evening dining. Would you like to trigger targeted WhatsApp concierge recommendations?
+                            </p>
+                        </div>
+                        <button class="btn btn-primary" style="width:100%; font-size:12px;" onclick="alert('Upsell campaign dispatched to 3 qualified guest profiles.')">Execute Recommendation</button>
                     </div>
                 </div>
 
-                <div class="p-4 rounded-lg bg-black/40 border border-white/5 text-xs text-coolGray leading-relaxed">
-                    <span class="text-white font-medium block mb-1">Illustrative Estimate:</span>
-                    Based on user-selected parameters. Actual impact varies by property scale, configured AI permissions, and system integration depth.
+                <div id="simulation-overlay" class="walkthrough-overlay">
+                    <div class="sim-container">
+                        
+                        <div class="phone-shell">
+                            <div class="phone-header">
+                                <span style="font-size:12px; font-weight:600; color:var(--text-muted);">WhatsApp • Room 508</span>
+                                <span class="badge badge-cyan" style="font-size:9px;">Live Simulation</span>
+                            </div>
+                            <div class="chat-area" id="sim-chat-area">
+                                <div class="chat-bubble guest">
+                                    Hi, could I get two extra towels please?
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel" style="padding:24px; display:flex; flex-direction:column; justify-content:space-between;" id="sim-control-panel">
+                            <div>
+                                <div class="badge badge-cyan mb-2">Step 1: AI Intent Understanding</div>
+                                <h3 style="font-size:18px; margin-bottom:12px;">Zero Manual Routing</h3>
+                                <div class="flow-visualizer mb-4">
+                                    <div class="flow-step active">
+                                        <i data-lucide="cpu" style="color:var(--accent);"></i>
+                                        <div style="font-size:12px;">
+                                            <div><strong>Intent:</strong> Housekeeping Request</div>
+                                            <div class="text-muted">Extracted entity: 2 Towels | Priority: Normal</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" id="sim-next-btn" onclick="advanceSimulation(1)">Process with OtonomiQ →</button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="ecosystem-screen" class="screen">
+        <div style="text-align:center; max-width:700px; margin-bottom:40px;">
+            <div class="hero-eyebrow">End-to-End Orchestration</div>
+            <h2 style="font-size:36px; font-weight:700; margin-bottom:12px;">One Request. An Entire Workflow.</h2>
+            <p class="text-muted">OtonomiQ does not simply understand conversations. It transforms multi-channel guest interactions into verified physical actions.</p>
+        </div>
+
+        <div class="eco-map" style="max-width:1100px; width:100%;">
+            <div class="eco-center">
+                <div class="logo-mark" style="margin:0 auto 12px; width:36px; height:36px;"><i data-lucide="layers" style="color:#000;"></i></div>
+                <h3 style="font-size:20px;">OTONOMIQ AI LAYER</h3>
+                <p class="text-muted" style="font-size:12px;">Contextual Decisioning Engine</p>
+            </div>
+
+            <div class="glass-card" style="padding:20px; cursor:pointer;" onclick="switchTab('guest-intel')">
+                <i data-lucide="message-square" style="color:var(--accent); margin-bottom:12px;"></i>
+                <h4>Guest Intelligence</h4>
+                <p class="text-muted" style="font-size:12px; margin-top:4px;">Conversations → Context → Bookings</p>
+            </div>
+            <div class="glass-card" style="padding:20px; cursor:pointer;" onclick="switchTab('ops-center')">
+                <i data-lucide="check-square" style="color:var(--accent); margin-bottom:12px;"></i>
+                <h4>Operations Control</h4>
+                <p class="text-muted" style="font-size:12px; margin-top:4px;">Tasks → Auto-SLA → Escalation</p>
+            </div>
+            <div class="glass-card" style="padding:20px; cursor:pointer;" onclick="switchTab('revenue-intel')">
+                <i data-lucide="trending-up" style="color:var(--accent); margin-bottom:12px;"></i>
+                <h4>Revenue Intelligence</h4>
+                <p class="text-muted" style="font-size:12px; margin-top:4px;">Opportunities → Upsells → Conversion</p>
+            </div>
+            <div class="glass-card" style="padding:20px; cursor:pointer;" onclick="switchTab('fb-intel')">
+                <i data-lucide="utensils" style="color:var(--accent); margin-bottom:12px;"></i>
+                <h4>F&B Intelligence</h4>
+                <p class="text-muted" style="font-size:12px; margin-top:4px;">Orders → POS Push → Protection</p>
+            </div>
+            <div class="glass-card" style="padding:20px; cursor:pointer;" onclick="switchTab('ai-workforce')">
+                <i data-lucide="bot" style="color:var(--accent); margin-bottom:12px;"></i>
+                <h4>AI Workforce</h4>
+                <p class="text-muted" style="font-size:12px; margin-top:4px;">Autonomous Multi-Agent System</p>
+            </div>
+            <div class="glass-card" style="padding:20px; cursor:pointer;" onclick="switchTab('copilot')">
+                <i data-lucide="sparkles" style="color:var(--accent); margin-bottom:12px;"></i>
+                <h4>AI Co-Pilot</h4>
+                <p class="text-muted" style="font-size:12px; margin-top:4px;">Strategic Insights → Action Plan</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="integration-screen" class="screen">
+        <div style="text-align:center; max-width:700px; margin-bottom:40px;">
+            <div class="hero-eyebrow">Enterprise Compatibility</div>
+            <h2 style="font-size:36px; font-weight:700; margin-bottom:12px;">Your Systems Don't Need to Be Replaced.</h2>
+            <p class="text-muted">They need an intelligence layer. OtonomiQ wraps around your existing infrastructure seamlessly.</p>
+        </div>
+
+        <div style="max-width:900px; width:100%;">
+            <div class="integration-stages">
+                <div class="glass-card stage-card selected" onclick="selectStage(1, this)">
+                    <div class="badge badge-cyan mb-2">Stage 01</div>
+                    <h4>Standalone</h4>
+                    <p class="text-muted" style="font-size:12px; margin-top:8px;">Zero integration required. Instant AI messaging & task board deployment.</p>
+                </div>
+                <div class="glass-card stage-card" onclick="selectStage(2, this)">
+                    <div class="badge badge-amber mb-2">Stage 02</div>
+                    <h4>Connected</h4>
+                    <p class="text-muted" style="font-size:12px; margin-top:8px;">Webhooks & CSV sync for daily reservations and staff directories.</p>
+                </div>
+                <div class="glass-card stage-card" onclick="selectStage(3, this)">
+                    <div class="badge badge-green mb-2">Stage 03</div>
+                    <h4>Real-Time Deep API</h4>
+                    <p class="text-muted" style="font-size:12px; margin-top:8px;">Bi-directional real-time sync with Opera, Oracle, Cloudbeds, and Micros POS.</p>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="margin-top:24px; padding:30px; text-align:center;" id="integration-diagram">
+                <div style="display:flex; justify-content:space-around; align-items:center; opacity:0.6; font-size:13px;">
+                    <span>Opera PMS</span> • <span>Micros POS</span> • <span>WhatsApp Business</span> • <span>Oracle Hospitality</span>
+                </div>
+                <div style="margin:20px 0; font-size:24px; color:var(--accent);">↓</div>
+                <div style="padding:16px; background:var(--accent-dim); border:1px solid var(--accent); border-radius:var(--radius-sm); font-weight:600;">
+                    OTONOMIQ AI OPERATING LAYER
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="how-it-works" class="py-24 px-6 max-w-7xl mx-auto border-t border-white/5">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-            <h2 class="text-3xl md:text-5xl font-semibold mb-4">
-                Start with one workflow.<br/>
-                <span class="accent-gradient-text">Prove it. Then expand.</span>
-            </h2>
+    <section id="impact-screen" class="screen">
+        <div style="text-align:center; max-width:700px; margin-bottom:40px;">
+            <div class="hero-eyebrow">Operational Transformation</div>
+            <h2 style="font-size:36px; font-weight:700; margin-bottom:12px;">Less Coordination. More Execution.</h2>
         </div>
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="glass-panel p-6 rounded-xl border border-white/5">
-                <span class="text-xs font-mono text-accentTeal block mb-3">01 — DISCOVER</span>
-                <h3 class="text-lg font-medium text-white mb-2">Identify Target</h3>
-                <p class="text-xs text-coolGray leading-relaxed">Select the friction-filled workflow that matters most to your hotel's bottom line.</p>
-            </div>
-
-            <div class="glass-panel p-6 rounded-xl border border-white/5">
-                <span class="text-xs font-mono text-accentTeal block mb-3">02 — CONFIGURE</span>
-                <h3 class="text-lg font-medium text-white mb-2">Define Boundaries</h3>
-                <p class="text-xs text-coolGray leading-relaxed">Configure OtonomiQ around your team roles, authorization limits, and operational KPIs.</p>
-            </div>
-
-            <div class="glass-panel p-6 rounded-xl border border-white/5">
-                <span class="text-xs font-mono text-accentTeal block mb-3">03 — EXECUTE</span>
-                <h3 class="text-lg font-medium text-white mb-2">Live Assisted Flow</h3>
-                <p class="text-xs text-coolGray leading-relaxed">Run live operational workflows with AI contextual assistance and human managerial approval.</p>
-            </div>
-
-            <div class="glass-panel p-6 rounded-xl border border-white/5">
-                <span class="text-xs font-mono text-accentTeal block mb-3">04 — EXPAND</span>
-                <h3 class="text-lg font-medium text-white mb-2">Scale Across Ops</h3>
-                <p class="text-xs text-coolGray leading-relaxed">Leverage cross-departmental learnings to roll out intelligence to adjacent departments.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-24 px-6 max-w-7xl mx-auto border-t border-white/5">
-        <div class="mb-16 text-center max-w-3xl mx-auto">
-            <h2 class="text-3xl md:text-5xl font-semibold mb-4">
-                AI that works with your team.<br/>
-                <span class="text-coolGray">Not instead of it.</span>
-            </h2>
+        <div style="max-width:1000px; width:100%;">
+            <table class="comp-table glass-panel">
+                <thead>
+                    <tr>
+                        <th>Operational Flow</th>
+                        <th>Traditional Hospitality</th>
+                        <th style="color:var(--accent);">OtonomiQ AI Layer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Guest Service Request</td>
+                        <td class="text-muted">Guest → Phone → Front Desk → Manual Ticket → Dispatch</td>
+                        <td style="color:var(--accent); font-weight:600;">Guest → AI Understands → Instant Task & SLA Dispatch</td>
+                    </tr>
+                    <tr>
+                        <td>Upsell Identification</td>
+                        <td class="text-muted">Front desk agent manually checks availability at check-in</td>
+                        <td style="color:var(--accent); font-weight:600;">Automated real-time intent matching & revenue routing</td>
+                    </tr>
+                    <tr>
+                        <td>F&B Order Handling</td>
+                        <td class="text-muted">Manual phone taking, risk of error & uncharged bills</td>
+                        <td style="color:var(--accent); font-weight:600;">Direct conversational order to POS with automatic room posting</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="glass-panel p-8 rounded-xl border border-white/5">
-                <h3 class="text-lg font-medium text-white mb-2">Human Control</h3>
-                <p class="text-sm text-coolGray leading-relaxed">AI analyzes context and recommends optimal actions. Your managerial staff retains final authorization on all financial and high-stakes commitment decisions.</p>
+        <div style="margin-top:80px; text-align:center;">
+            <h3 style="font-size:28px; font-weight:700; margin-bottom:16px;">Ready to put AI to work?</h3>
+            <p class="text-muted" style="margin-bottom:24px;">See what OtonomiQ can do for your hotel group.</p>
+            <div style="display:flex; gap:16px; justify-content:center;">
+                <button class="btn btn-primary" onclick="alert('Thank you for your interest. Sales team notified.')">Book a Live Demo</button>
+                <button class="btn btn-secondary" onclick="alert('Contacting ATM Dubai Stand AI01 representative...')">Talk to Our Team</button>
             </div>
-
-            <div class="glass-panel p-8 rounded-xl border border-white/5">
-                <h3 class="text-lg font-medium text-white mb-2">Auditability</h3>
-                <p class="text-sm text-coolGray leading-relaxed">Every recommendation, data retrieval event, and executed workflow step is logged in an immutable operational audit trail for clear accountability.</p>
-            </div>
-
-            <div class="glass-panel p-8 rounded-xl border border-white/5">
-                <h3 class="text-lg font-medium text-white mb-2">Data & System Boundaries</h3>
-                <p class="text-sm text-coolGray leading-relaxed">OtonomiQ overlays on top of your existing hotel technology stack. Zero forced rip-and-replace of legacy PMS or POS investments required.</p>
-            </div>
-
-            <div class="glass-panel p-8 rounded-xl border border-white/5">
-                <h3 class="text-lg font-medium text-white mb-2">Capability Transparency</h3>
-                <p class="text-sm text-coolGray leading-relaxed">We strictly differentiate between currently operational features, property-configurable routines, and future engineering roadmap developments.</p>
-            </div>
+            <div style="margin-top:20px; font-size:12px; color:var(--text-dark);">Meet OtonomiQ — Stand AI01 | ATM Dubai 2026</div>
         </div>
     </section>
-
-    <section class="py-24 px-6 max-w-4xl mx-auto border-t border-white/5">
-        <h2 class="text-3xl md:text-4xl font-semibold text-center mb-12">Questions executives ask before adopting AI.</h2>
-
-        <div class="space-y-6">
-            <div class="glass-panel p-6 rounded-xl border border-white/5">
-                <h3 class="text-base font-medium text-white mb-2">Is OtonomiQ replacing our PMS?</h3>
-                <p class="text-sm text-coolGray leading-relaxed">No. OtonomiQ is designed as an intelligence and execution layer that operates on top of existing PMS, POS, and CRM systems of record.</p>
-            </div>
-
-            <div class="glass-panel p-6 rounded-xl border border-white/5">
-                <h3 class="text-base font-medium text-white mb-2">Does OtonomiQ make decisions autonomously?</h3>
-                <p class="text-sm text-coolGray leading-relaxed">AI recommends actions and coordinates execution, while human approval remains strictly in control for financial or policy-binding decisions.</p>
-            </div>
-
-            <div class="glass-panel p-6 rounded-xl border border-white/5">
-                <h3 class="text-base font-medium text-white mb-2">Can Hotel OS be configured for our specific property policies?</h3>
-                <p class="text-sm text-coolGray leading-relaxed">Yes. Configuration adapts to your brand standards, operational rules, role authorizations, and approval thresholds.</p>
-            </div>
-
-            <div class="glass-panel p-6 rounded-xl border border-white/5">
-                <h3 class="text-base font-medium text-white mb-2">How do we start a pilot?</h3>
-                <p class="text-sm text-coolGray leading-relaxed">Start with a single high-impact workflow (e.g., guest communications or housekeeping dispatch), prove efficiency gains, and scale across departments.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="demo" class="py-32 px-6 border-t border-white/5 text-center relative overflow-hidden">
-        <div class="absolute inset-0 bg-accentTeal/5 pointer-events-none"></div>
-        <div class="max-w-4xl mx-auto relative z-10">
-            <h2 class="text-3xl sm:text-5xl md:text-6xl font-semibold mb-4">
-                Your hotel is already generating the data.
-            </h2>
-            <p class="text-2xl sm:text-4xl md:text-5xl font-semibold accent-gradient-text mb-8">
-                OtonomiQ turns it into action.
-            </p>
-            <p class="text-coolGray text-base max-w-xl mx-auto mb-10">
-                Start with the workflow that matters most to your organization. Prove it. Then decide what's next.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="#experience" class="w-full sm:w-auto bg-accentTeal text-obsidian font-semibold px-8 py-4 rounded-md hover:bg-white transition-all text-sm shadow-tealGlow">
-                    Experience Hotel OS →
-                </a>
-                <a href="mailto:pilot@otonomiq.ai" class="w-full sm:w-auto glass-panel border border-cardBorder text-white font-medium px-8 py-4 rounded-md hover:border-white/20 transition-all text-sm">
-                    Book a Pilot
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <footer class="border-t border-white/5 py-12 px-6 bg-charcoal">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8 text-xs text-coolGray">
-            <div>
-                <span class="font-bold text-lg text-white block mb-1">OTONOMIQ</span>
-                <p>AI-native hospitality operations. Human-controlled. Built to execute.</p>
-            </div>
-
-            <div class="flex flex-wrap gap-6 font-medium">
-                <a href="#platform" class="hover:text-white transition-colors">Platform</a>
-                <a href="#hotel-os" class="hover:text-white transition-colors">Hotel OS</a>
-                <a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a>
-                <a href="#experience" class="hover:text-white transition-colors">Experience</a>
-                <a href="#demo" class="hover:text-white transition-colors">Book a Pilot</a>
-            </div>
-
-            <div>
-                &copy; 2026 OtonomiQ Inc. All rights reserved.
-            </div>
-        </div>
-    </footer>
 
     <script>
-        // Interactive Workflow Simulation Engine (Section 05)
-        const workflowStages = [
-            {
-                title: "01 — SENSE: Request Detected",
-                desc: "OtonomiQ natural language processing parses multi-intent guest inquiry from WhatsApp stream.",
-                status: "Signal Parsed: Guest Intent Identified"
-            },
-            {
-                title: "02 — UNDERSTAND: Context Retrieval",
-                desc: "Retrieving PMS booking data (Room 504), loyalty status (Platinum), late checkout availability, and table slots at Restaurant fine-dining.",
-                status: "Context Synthesized: Late checkout free till 2PM; 8 PM dining table available."
-            },
-            {
-                title: "03 — DECIDE: AI Recommendation Propose",
-                desc: "AI recommends approving late checkout to 2:00 PM and reserving table at 8:00 PM based on guest VIP profile.",
-                status: "Recommendation Formulated: Waiting Approval"
-            },
-            {
-                title: "04 — ACT: Workflow Task Dispatch",
-                desc: "Formulating auto-dispatches to Front Desk (PMS late checkout tag) and F&B Host (Table booking engine).",
-                status: "Tasks Staged for Execution"
-            },
-            {
-                title: "05 — VERIFY: Human Approval Governance",
-                desc: "Front Office Manager receives one-click approval alert on dashboard to confirm complimentary late checkout.",
-                status: "Human Approval Granted by Duty Manager"
-            },
-            {
-                title: "06 — LEARN: Memory Capture & Confirmation",
-                desc: "Confirmation WhatsApp message sent to guest. Preferred late checkout and dining times updated in Guest CRM Profile.",
-                status: "Workflow Complete: Guest Preference Captured"
-            }
-        ];
+        // Initialize Lucide Icons
+        lucide.createIcons();
 
-        let currentStage = 0;
+        // Smooth Scrolling Navigation
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
 
-        function advanceWorkflow() {
-            currentStage = (currentStage + 1) % workflowStages.length;
+        // Enter Experience Button Handler
+        function enterExperience() {
+            scrollToSection('platform-screen');
+        }
+
+        // Sidebar Navigation Tab Switching
+        function switchTab(tabName) {
+            const items = document.querySelectorAll('.sidebar-item');
+            items.forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
             
-            // Highlight indicators
-            for(let i = 1; i <= 6; i++) {
-                const el = document.getElementById(`step-${i}`);
-                if (i === currentStage + 1) {
-                    el.className = "glass-panel p-3 rounded-lg border-accentTeal/40 bg-accentTeal/10 text-accentTeal transition-all text-xs font-mono";
-                } else {
-                    el.className = "glass-panel p-3 rounded-lg border-white/5 text-coolGray transition-all text-xs font-mono";
-                }
-            }
+            // Note: Extendable to switch main-stage UI components dynamically
+        }
 
-            // Update content panel
-            document.getElementById('stage-title').innerText = workflowStages[currentStage].title;
-            document.getElementById('stage-description').innerText = workflowStages[currentStage].desc;
-            document.getElementById('stage-status').innerText = workflowStages[currentStage].status;
-            
-            const btn = document.getElementById('next-stage-btn');
-            if (currentStage === workflowStages.length - 1) {
-                btn.innerText = "Restart Demo ↺";
-            } else {
-                btn.innerText = "Advance Stage →";
+        // Guided Tour Banner Handler
+        function dismissPrompt() {
+            document.getElementById('guided-prompt').classList.add('hidden');
+        }
+
+        function startSimulation() {
+            document.getElementById('simulation-overlay').classList.add('active');
+        }
+
+        // Simulation Engine State Handler (Prompts 04-09)
+        let simStep = 0;
+        function advanceSimulation(step) {
+            const chatArea = document.getElementById('sim-chat-area');
+            const controlPanel = document.getElementById('sim-control-panel');
+
+            if (step === 1) {
+                // Step 2: Task Created UI
+                controlPanel.innerHTML = `
+                    <div>
+                        <div class="badge badge-amber mb-2">Step 2: Operations Dispatch</div>
+                        <h3 style="font-size:18px; margin-bottom:12px;">Task Automatically Created</h3>
+                        <div class="glass-card" style="padding:16px; border-left:3px solid var(--warning); margin-bottom:16px;">
+                            <div style="font-weight:600; font-size:14px;">NEW HOUSEKEEPING REQUEST</div>
+                            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Room 508 • 🧺 2 Extra Towels</div>
+                            <div style="font-size:11px; color:var(--accent); margin-top:8px;">SLA Countdown: 15:00</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="advanceSimulation(2)">Switch to Staff Mobile View →</button>
+                `;
+            } else if (step === 2) {
+                // Step 3: Staff Perspective (Mobile PWA)
+                controlPanel.innerHTML = `
+                    <div>
+                        <div class="badge badge-cyan mb-2">Step 3: Staff Experience</div>
+                        <h3 style="font-size:18px; margin-bottom:12px;">Staff Mobile PWA</h3>
+                        <div class="glass-card" style="padding:16px; text-align:center; margin-bottom:16px;">
+                            <div style="font-size:12px; color:var(--text-muted);">Assigned to: Housekeeping Staff</div>
+                            <div style="font-size:16px; font-weight:700; margin:8px 0;">Room 508 (2 Towels)</div>
+                            <button class="btn btn-primary" style="width:100%; font-size:12px;" id="accept-btn" onclick="this.innerText='Task Accepted ✓'; this.style.background='var(--success)'; setTimeout(()=>advanceSimulation(3), 1000);">Accept Task</button>
+                        </div>
+                    </div>
+                `;
+            } else if (step === 3) {
+                // Step 4: Completion & Guest WhatsApp Update
+                chatArea.innerHTML += `
+                    <div class="chat-bubble system" style="margin-top:12px;">
+                        Your extra towels have been delivered to room 508.
+                    </div>
+                    <div class="chat-bubble guest" style="margin-top:6px;">
+                        Thank you!
+                    </div>
+                `;
+                controlPanel.innerHTML = `
+                    <div>
+                        <div class="badge badge-green mb-2">Workflow Complete</div>
+                        <h3 style="font-size:18px; margin-bottom:12px;">Execution Verified</h3>
+                        <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">
+                            One guest request resolved instantly with zero phone calls and zero manual front desk coordination.
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" onclick="closeSimulation()">Complete Interactive Demo</button>
+                `;
             }
         }
 
-        // Dynamic Business Impact Calculator (Section 10)
-        function calculateImpact() {
-            const vol = parseInt(document.getElementById('vol-slider').value);
-            const mins = parseInt(document.getElementById('time-slider').value);
+        function closeSimulation() {
+            document.getElementById('simulation-overlay').classList.remove('active');
+            dismissPrompt();
+        }
 
-            document.getElementById('vol-val').innerText = vol.toLocaleString();
-            document.getElementById('time-val').innerText = mins;
+        // Integration Stage Selector (Prompt 20)
+        function selectStage(stageNum, element) {
+            document.querySelectorAll('.stage-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+        }
 
-            // Simple estimation formula
-            const timeSavedHours = Math.round((vol * (mins * 0.70)) / 60);
-            const speedUpFactor = (mins / (mins * 0.22)).toFixed(1);
-
-            document.getElementById('hours-saved').innerText = timeSavedHours.toLocaleString();
-            document.getElementById('speedup').innerText = `${speedUpFactor}x`;
+        // Escalation Trigger (Prompt 16)
+        function triggerEscalation() {
+            alert('Escalation Triggered: Engineering Supervisor notified via SMS & Push notification.');
         }
     </script>
 </body>
