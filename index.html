@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OtonomiQ Hotel OS — The Operating System for Hospitality</title>
-    <!-- Tailwind CSS CDN -->
+    <title>OtonomiQ Hotel OS — 3D Parallax Experience</title>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons CDN -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Custom Font & Styles -->
+    <!-- Three.js CDN for 3D Graphics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -22,837 +27,512 @@
                     },
                     colors: {
                         brand: {
-                            50: '#f0f7ff',
                             500: '#3b82f6',
                             600: '#2563eb',
-                            900: '#0f172a',
                             950: '#030712',
-                        },
-                        glass: {
-                            border: 'rgba(255, 255, 255, 0.08)',
-                            surface: 'rgba(15, 23, 42, 0.65)',
-                            hover: 'rgba(255, 255, 255, 0.03)',
-                        }
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 6s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-10px)' },
                         }
                     }
                 }
             }
         }
     </script>
+
     <style>
         body {
             background-color: #030712;
             color: #f8fafc;
             overflow-x: hidden;
+            margin: 0;
+            padding: 0;
         }
+
+        /* Fixed Three.js WebGL Canvas Background */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glassmorphic UI Panels */
         .glass-panel {
             background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .glass-panel-interactive {
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(59, 130, 246, 0.15);
         }
-        .glass-panel-interactive:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
-        }
-        .glow-effect {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            pointer-events: none;
-            z-index: 0;
-        }
-        /* Custom scrollbar */
+
+        /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #030712;
         }
         ::-webkit-scrollbar-thumb {
             background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
-        }
-        /* Transition utility classes for scroll animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
+            border-radius: 3px;
         }
     </style>
 </head>
 <body class="font-sans antialiased selection:bg-blue-500 selection:text-white">
 
-    <!-- Global Background Elements -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div class="glow-effect top-[-10%] left-[20%] w-[500px] h-[500px] bg-blue-600/10"></div>
-        <div class="glow-effect bottom-[20%] right-[-10%] w-[600px] h-[600px] bg-indigo-600/10"></div>
-    </div>
+    <!-- THREE.JS CANVAS BACKGROUND -->
+    <canvas id="webgl-canvas"></canvas>
 
-    <!-- Navigation Bar -->
-    <nav class="fixed top-0 inset-x-0 z-50 glass-panel border-b border-white/5 px-6 py-4">
+    <!-- FIXED TOP NAVIGATION -->
+    <nav class="fixed top-0 inset-x-0 z-50 glass-panel border-b border-white/10 px-6 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white tracking-wider">O</div>
+                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">O</div>
                 <span class="font-bold tracking-tight text-lg text-white">OtonomiQ <span class="text-xs font-medium text-blue-400 uppercase tracking-widest ml-1">Hotel OS</span></span>
             </div>
-            
-            <div class="hidden md:flex items-center gap-8 text-xs font-medium tracking-wide uppercase text-slate-400">
-                <a href="#overview" class="hover:text-white transition-colors">Overview</a>
-                <a href="#intelligence" class="hover:text-white transition-colors">Intelligence</a>
-                <a href="#orchestration" class="hover:text-white transition-colors">Workflows</a>
-                <a href="#modules" class="hover:text-white transition-colors">Ecosystem</a>
+
+            <!-- Experience Controller Step Buttons -->
+            <div class="hidden lg:flex items-center gap-2 p-1 rounded-full glass-panel border-white/5 text-xs">
+                <button onclick="navigateToStep(0)" id="nav-btn-0" class="step-nav-btn px-4 py-1.5 rounded-full bg-blue-600 text-white font-medium transition-all">01. Hero</button>
+                <button onclick="navigateToStep(1)" id="nav-btn-1" class="step-nav-btn px-4 py-1.5 rounded-full text-slate-400 hover:text-white transition-all">02. Guest AI</button>
+                <button onclick="navigateToStep(2)" id="nav-btn-2" class="step-nav-btn px-4 py-1.5 rounded-full text-slate-400 hover:text-white transition-all">03. Workflow</button>
+                <button onclick="navigateToStep(3)" id="nav-btn-3" class="step-nav-btn px-4 py-1.5 rounded-full text-slate-400 hover:text-white transition-all">04. Revenue</button>
+                <button onclick="navigateToStep(4)" id="nav-btn-4" class="step-nav-btn px-4 py-1.5 rounded-full text-slate-400 hover:text-white transition-all">05. Command</button>
             </div>
 
-            <div class="flex items-center gap-4">
-                <a href="#cta" class="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold tracking-wide transition-all shadow-lg shadow-blue-600/20">
-                    Experience Hotel OS →
-                </a>
-            </div>
+            <a href="#cta" class="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold tracking-wide transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2">
+                <span>Experience OS</span>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            </a>
         </div>
     </nav>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="relative z-10 pt-24 space-y-32 mb-20">
+    <!-- CONTENT SECTIONS (SCROLL OVERLAY TO TRIGGER 3D CAMERA PARALLAX) -->
+    <main class="relative z-10 space-y-40 pb-32 pt-28">
 
-        <!-- 01. HERO SECTION -->
-        <section id="overview" class="min-h-[90vh] flex flex-col justify-center items-center px-4 max-w-7xl mx-auto text-center relative pt-12">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border border-blue-500/30 text-blue-400 text-xs font-medium mb-8 reveal">
-                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                CHAPTER 01 — THE OPERATING SYSTEM
+        <!-- SECTION 1: HERO -->
+        <section id="step-0" class="min-h-screen flex flex-col justify-center items-center px-4 max-w-6xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border-blue-500/30 text-blue-400 text-xs font-mono mb-6">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+                CHAPTER 01 — 3D IMMERSIVE OS
             </div>
 
-            <h1 class="text-4xl md:text-7xl font-extrabold tracking-tight text-white max-w-4xl leading-[1.1] mb-6 reveal">
-                Intelligence that actually moves the hotel.
+            <h1 class="text-5xl md:text-8xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-8">
+                Intelligence that <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400">actually moves</span> the hotel.
             </h1>
 
-            <p class="text-slate-400 text-lg md:text-xl max-w-2xl font-normal leading-relaxed mb-10 reveal">
-                One visual operating interface orchestrating Guests, Operations, Revenue, and AI Autonomous Agents in real time.
+            <p class="text-slate-300 text-lg md:text-xl max-w-2xl font-light leading-relaxed mb-12">
+                Scroll or click the experience steps above to fly through the 3D Hotel OS architecture.
             </p>
 
-            <!-- Main CTA Buttons -->
-            <div class="flex flex-col sm:flex-row items-center gap-4 mb-16 reveal">
-                <a href="#interactive-flow" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm tracking-wide transition-all shadow-xl shadow-blue-600/25 flex items-center justify-center gap-2">
-                    <span>Experience Hotel OS</span>
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <button onclick="navigateToStep(1)" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm tracking-wide transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-3">
+                    <span>Enter 3D Experience</span>
                     <i data-lucide="arrow-down" class="w-4 h-4"></i>
-                </a>
-                <a href="#cta" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel hover:bg-white/5 text-slate-300 font-medium text-sm tracking-wide transition-all border border-white/10">
-                    Talk to Our Team
-                </a>
-            </div>
-
-            <!-- HERO DASHBOARD CONTAINER -->
-            <div class="w-full max-w-6xl rounded-2xl glass-panel border border-white/10 p-4 md:p-6 shadow-2xl relative reveal group overflow-hidden">
-                <!-- Status Bar -->
-                <div class="flex items-center justify-between pb-4 border-b border-white/5 text-xs text-slate-400">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                        <span class="font-mono uppercase tracking-wider text-white">System Status: Optimal</span>
-                    </div>
-                    <div class="flex gap-4">
-                        <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-[10px] border border-blue-500/20">LIVE</span>
-                        <span class="hidden sm:inline font-mono">ID: HOS-8809-NY</span>
-                    </div>
-                </div>
-
-                <!-- Floating Interactive Grid Cards (Hero Graphic) -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-                    <!-- Guest Card -->
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 text-left relative overflow-hidden group-hover:border-blue-500/30 transition-all">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs text-slate-400 font-medium">Guest Activity</span>
-                            <i data-lucide="users" class="w-4 h-4 text-blue-400"></i>
-                        </div>
-                        <div class="text-2xl font-bold text-white mb-1">142</div>
-                        <div class="text-xs text-emerald-400 flex items-center gap-1">
-                            <i data-lucide="trending-up" class="w-3 h-3"></i> 98% Satisfaction Index
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-slate-400 flex justify-between">
-                            <span>Active Conversations</span>
-                            <span class="text-white font-mono">18</span>
-                        </div>
-                    </div>
-
-                    <!-- Operations Card -->
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 text-left relative overflow-hidden group-hover:border-blue-500/30 transition-all">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs text-slate-400 font-medium">Operations</span>
-                            <i data-lucide="check-square" class="w-4 h-4 text-amber-400"></i>
-                        </div>
-                        <div class="text-2xl font-bold text-white mb-1">28 Active</div>
-                        <div class="text-xs text-slate-400 flex items-center gap-1">
-                            <span>Avg SLA Response:</span>
-                            <span class="text-white font-mono">4.2 min</span>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-slate-400 flex justify-between">
-                            <span>Auto-Dispatched</span>
-                            <span class="text-emerald-400 font-mono">92%</span>
-                        </div>
-                    </div>
-
-                    <!-- Revenue Card -->
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 text-left relative overflow-hidden group-hover:border-blue-500/30 transition-all">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs text-slate-400 font-medium">Revenue Pace</span>
-                            <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
-                        </div>
-                        <div class="text-2xl font-bold text-white mb-1">91.4%</div>
-                        <div class="text-xs text-emerald-400 flex items-center gap-1">
-                            <i data-lucide="arrow-up-right" class="w-3 h-3"></i> +14% RevPAR vs Forecast
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-slate-400 flex justify-between">
-                            <span>Dynamic Rate Engine</span>
-                            <span class="text-blue-400 font-mono">Active</span>
-                        </div>
-                    </div>
-
-                    <!-- AI Agents Activity -->
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 text-left relative overflow-hidden group-hover:border-blue-500/30 transition-all">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs text-slate-400 font-medium">AI Workforce</span>
-                            <i data-lucide="cpu" class="w-4 h-4 text-indigo-400"></i>
-                        </div>
-                        <div class="text-2xl font-bold text-white mb-1">5 Agents</div>
-                        <div class="text-xs text-slate-400 flex items-center gap-1">
-                            <span>Autonomous Executions</span>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-slate-400 flex justify-between">
-                            <span>Tasks Resolved Today</span>
-                            <span class="text-white font-mono">384</span>
-                        </div>
-                    </div>
-                </div>
+                </button>
             </div>
         </section>
 
-        <!-- 02. MEET HOTEL OS — MODULE OVERVIEW -->
-        <section id="modules" class="max-w-7xl mx-auto px-4 py-16">
-            <div class="text-center mb-16 reveal">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border border-blue-500/30 text-blue-400 text-xs font-medium mb-4">
-                    CHAPTER 02 — COMPLETE ARCHITECTURE
-                </div>
-                <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">Meet Hotel OS</h2>
-                <p class="text-slate-400 max-w-2xl mx-auto">One unified system replacing fragmented software silos across your hotel property.</p>
-            </div>
-
-            <!-- Interactive Module Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-                <!-- Module 1 -->
-                <div class="glass-panel p-4 rounded-xl text-center flex flex-col items-center justify-center gap-3 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer group reveal">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                        <i data-lucide="message-square" class="w-5 h-5"></i>
+        <!-- SECTION 2: GUEST INTELLIGENCE & AI CONCIERGE -->
+        <section id="step-1" class="min-h-screen flex items-center max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+                <div class="space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono">
+                        CHAPTER 03 & 04 — GUEST INTELLIGENCE
                     </div>
-                    <span class="text-xs font-semibold text-white">Guest</span>
-                    <span class="text-[9px] text-emerald-400 uppercase font-mono tracking-wider">LIVE</span>
-                </div>
-                <!-- Module 2 -->
-                <div class="glass-panel p-4 rounded-xl text-center flex flex-col items-center justify-center gap-3 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer group reveal">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                        <i data-lucide="sliders" class="w-5 h-5"></i>
-                    </div>
-                    <span class="text-xs font-semibold text-white">Operations</span>
-                    <span class="text-[9px] text-emerald-400 uppercase font-mono tracking-wider">LIVE</span>
-                </div>
-                <!-- Module 3 -->
-                <div class="glass-panel p-4 rounded-xl text-center flex flex-col items-center justify-center gap-3 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer group reveal">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                        <i data-lucide="trending-up" class="w-5 h-5"></i>
-                    </div>
-                    <span class="text-xs font-semibold text-white">Revenue</span>
-                    <span class="text-[9px] text-emerald-400 uppercase font-mono tracking-wider">LIVE</span>
-                </div>
-                <!-- Module 4 -->
-                <div class="glass-panel p-4 rounded-xl text-center flex flex-col items-center justify-center gap-3 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer group reveal">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-                    </div>
-                    <span class="text-xs font-semibold text-white">Procurement</span>
-                    <span class="text-[9px] text-emerald-400 uppercase font-mono tracking-wider">LIVE</span>
-                </div>
-                <!-- Module 5 -->
-                <div class="glass-panel p-4 rounded-xl text-center flex flex-col items-center justify-center gap-3 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer group reveal">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                        <i data-lucide="utensils" class="w-5 h-5"></i>
-                    </div>
-                    <span class="text-xs font-semibold text-white">F&B</span>
-                    <span class="text-[9px] text-amber-400 uppercase font-mono tracking-wider">CONFIGURABLE</span>
-                </div>
-                <!-- Module 6 -->
-                <div class="glass-panel p-4 rounded-xl text-center flex flex-col items-center justify-center gap-3 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer group reveal">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                        <i data-lucide="pie-chart" class="w-5 h-5"></i>
-                    </div>
-                    <span class="text-xs font-semibold text-white">Finance</span>
-                    <span class="text-[9px] text-amber-400 uppercase font-mono tracking-wider">CONFIGURABLE</span>
-                </div>
-                <!-- Module 7 -->
-                <div class="glass-panel p-4 rounded-xl text-center flex flex-col items-center justify-center gap-3 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all cursor-pointer group reveal">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
-                        <i data-lucide="shield" class="w-5 h-5"></i>
-                    </div>
-                    <span class="text-xs font-semibold text-white">Management</span>
-                    <span class="text-[9px] text-blue-400 uppercase font-mono tracking-wider">ROADMAP</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- 03-06. TRANSFORMING WORKFLOW JOURNEY (INTERACTIVE SCROLL FLOW) -->
-        <section id="interactive-flow" class="max-w-7xl mx-auto px-4 py-16">
-            <div class="text-center mb-16 reveal">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border border-blue-500/30 text-blue-400 text-xs font-medium mb-4">
-                    CHAPTER 03–06 — LIVE WORKFLOW ORCHESTRATION
-                </div>
-                <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">From Conversation to Completed Task</h2>
-                <p class="text-slate-400 max-w-2xl mx-auto">See how a single guest message triggers AI context, dynamic policies, and automated staff execution.</p>
-            </div>
-
-            <!-- Dynamic Transformation Interactive Container -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                <!-- Left Navigation Controls (Steps) -->
-                <div class="lg:col-span-4 space-y-4">
-                    <!-- Step 1 Control -->
-                    <div id="step-btn-1" onclick="setActiveStep(1)" class="glass-panel p-5 rounded-2xl border-l-4 border-l-blue-500 border-white/10 cursor-pointer transition-all hover:bg-white/5">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-mono uppercase text-blue-400 font-bold">Step 01 — Guest Request</span>
-                            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono">LIVE</span>
-                        </div>
-                        <h3 class="text-base font-semibold text-white">Guest Messaging Interface</h3>
-                        <p class="text-xs text-slate-400 mt-1">Unstructured guest prompt received via mobile/WhatsApp.</p>
-                    </div>
-
-                    <!-- Step 2 Control -->
-                    <div id="step-btn-2" onclick="setActiveStep(2)" class="glass-panel p-5 rounded-2xl border-l-4 border-l-transparent border-white/10 cursor-pointer transition-all hover:bg-white/5 opacity-60">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-mono uppercase text-indigo-400 font-bold">Step 02 — AI Understanding</span>
-                            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono">LIVE</span>
-                        </div>
-                        <h3 class="text-base font-semibold text-white">Context & Policy Engine</h3>
-                        <p class="text-xs text-slate-400 mt-1">AI identifies VIP status, room availability, and rules.</p>
-                    </div>
-
-                    <!-- Step 3 Control -->
-                    <div id="step-btn-3" onclick="setActiveStep(3)" class="glass-panel p-5 rounded-2xl border-l-4 border-l-transparent border-white/10 cursor-pointer transition-all hover:bg-white/5 opacity-60">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-mono uppercase text-amber-400 font-bold">Step 03 — Operational Task</span>
-                            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono">LIVE</span>
-                        </div>
-                        <h3 class="text-base font-semibold text-white">Staff SLA & Task Dispatch</h3>
-                        <p class="text-xs text-slate-400 mt-1">Automated ticket generated with SLA timers and routing.</p>
-                    </div>
-
-                    <!-- Step 4 Control -->
-                    <div id="step-btn-4" onclick="setActiveStep(4)" class="glass-panel p-5 rounded-2xl border-l-4 border-l-transparent border-white/10 cursor-pointer transition-all hover:bg-white/5 opacity-60">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-mono uppercase text-emerald-400 font-bold">Step 04 — Human Control</span>
-                            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono">LIVE</span>
-                        </div>
-                        <h3 class="text-base font-semibold text-white">Approval & Completion</h3>
-                        <p class="text-xs text-slate-400 mt-1">Human-in-the-loop validation and audit log updates.</p>
-                    </div>
-                </div>
-
-                <!-- Right Live Preview Interactive Screen -->
-                <div class="lg:col-span-8 glass-panel p-6 rounded-2xl border border-white/10 min-h-[460px] flex flex-col justify-between relative overflow-hidden">
-                    
-                    <!-- DISPLAY STEP 1: GUEST CHAT -->
-                    <div id="step-content-1" class="space-y-6 transition-all duration-500">
-                        <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-white font-bold">
-                                    AK
-                                </div>
-                                <div>
-                                    <h4 class="text-sm font-semibold text-white">Alexander Knight <span class="text-xs font-normal text-amber-400 ml-2">★ VIP Titanium</span></h4>
-                                    <p class="text-xs text-slate-400">Suite 402 — Checking out tomorrow</p>
-                                </div>
-                            </div>
-                            <span class="text-xs text-slate-400 font-mono">10:42 AM</span>
-                        </div>
-
-                        <!-- Chat Message Box -->
-                        <div class="space-y-4 max-w-xl">
-                            <div class="glass-panel p-4 rounded-2xl border-white/10 text-sm text-slate-200">
-                                “Can I get a late checkout at 2 PM tomorrow, and could you book dinner for two at the rooftop restaurant at 8 PM?”
-                            </div>
-                            <div class="flex items-center gap-2 text-xs text-blue-400">
-                                <i data-lucide="sparkles" class="w-4 h-4 animate-spin"></i>
-                                <span>OtonomiQ Engine Analyzing Intent & Context...</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DISPLAY STEP 2: AI CONCIERGE UNDERSTANDING (Hidden initially) -->
-                    <div id="step-content-2" class="space-y-6 hidden transition-all duration-500">
-                        <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                            <div class="flex items-center gap-2 text-indigo-400 font-mono text-xs font-bold">
-                                <i data-lucide="cpu" class="w-4 h-4"></i>
-                                <span>AI CONCIERGE ANALYSIS ENGINE</span>
-                            </div>
-                            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-mono">CONFIDENCE 99.4%</span>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                            <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
-                                <span class="text-slate-400 font-mono uppercase text-[10px]">Identified Context</span>
-                                <div class="text-white font-medium">VIP Tier: Titanium (Eligible for late 2PM checkout)</div>
-                                <div class="text-slate-400">Next Suite Reservation: 4:00 PM tomorrow</div>
-                            </div>
-                            <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
-                                <span class="text-slate-400 font-mono uppercase text-[10px]">Policy Verification</span>
-                                <div class="text-emerald-400 font-medium">Late checkout approved (Within house rules)</div>
-                                <div class="text-white font-medium">Rooftop Restaurant: 2 seats available at 8:00 PM</div>
-                            </div>
-                        </div>
-
-                        <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-200">
-                            <span class="font-bold">Recommendation:</span> Approve 2 PM Late Checkout + Create F&B Table Reservation ticket automatically.
-                        </div>
-                    </div>
-
-                    <!-- DISPLAY STEP 3: WORKFLOW / TASK CREATION -->
-                    <div id="step-content-3" class="space-y-6 hidden transition-all duration-500">
-                        <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                            <div class="flex items-center gap-2 text-amber-400 font-mono text-xs font-bold">
-                                <i data-lucide="check-square" class="w-4 h-4"></i>
-                                <span>TASK TICKET #TK-9042</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs text-slate-400 font-mono">SLA Timer:</span>
-                                <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono text-xs">14:59 min</span>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3 text-xs">
-                            <div class="flex justify-between p-3 rounded-lg bg-slate-900/60 border border-white/5">
-                                <span class="text-slate-400">Assigned Department:</span>
-                                <span class="text-white font-medium">Housekeeping & Front Desk</span>
-                            </div>
-                            <div class="flex justify-between p-3 rounded-lg bg-slate-900/60 border border-white/5">
-                                <span class="text-slate-400">Priority Level:</span>
-                                <span class="text-amber-400 font-medium uppercase">High (VIP Priority)</span>
-                            </div>
-                            <div class="flex justify-between p-3 rounded-lg bg-slate-900/60 border border-white/5">
-                                <span class="text-slate-400">Auto Actions Pending:</span>
-                                <span class="text-white font-mono">Update PMS Keycard Validity -> 14:00</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DISPLAY STEP 4: HUMAN CONTROL & APPROVAL -->
-                    <div id="step-content-4" class="space-y-6 hidden transition-all duration-500">
-                        <div class="flex items-center justify-between pb-4 border-b border-white/10">
-                            <div class="flex items-center gap-2 text-emerald-400 font-mono text-xs font-bold">
-                                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                                <span>HUMAN APPROVAL GATEWAY</span>
-                            </div>
-                            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">AUDIT READY</span>
-                        </div>
-
-                        <div class="p-5 rounded-xl bg-slate-900/90 border border-white/10 space-y-4">
-                            <div class="text-xs text-slate-300">
-                                AI Agent requests confirmation: <span class="text-white font-bold">Approve 2 PM Checkout & Reserve Rooftop Table for Suite 402?</span>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-3">
-                                <button onclick="alert('Action Approved! Synced to Opera PMS and WhatsApp sent to guest.')" class="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-all shadow-lg shadow-emerald-600/20">
-                                    Approve Action
-                                </button>
-                                <button class="px-4 py-2.5 rounded-lg glass-panel hover:bg-white/5 text-slate-300 text-xs">
-                                    Modify Parameters
-                                </button>
-                                <button class="px-4 py-2.5 rounded-lg glass-panel hover:bg-red-500/10 text-red-400 text-xs border border-red-500/20">
-                                    Escalate to Manager
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="text-[11px] text-slate-500 font-mono flex items-center gap-2">
-                            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
-                            <span>Audit Trail: Action logged under Manager ID #4401</span>
-                        </div>
-                    </div>
-
-                    <!-- Next Step Dynamic Switcher -->
-                    <div class="pt-4 border-t border-white/10 flex justify-between items-center text-xs">
-                        <span class="text-slate-400">Interactive Simulation</span>
-                        <div class="flex items-center gap-2">
-                            <button onclick="prevStep()" class="p-2 rounded-lg glass-panel hover:bg-white/5 text-white">
-                                <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="nextStep()" class="p-2 rounded-lg glass-panel hover:bg-white/5 text-white">
-                                <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- 07-08. REVENUE & PROCUREMENT INTELLIGENCE -->
-        <section class="max-w-7xl mx-auto px-4 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                <!-- Revenue Intelligence Card -->
-                <div class="glass-panel p-8 rounded-2xl border border-white/10 space-y-6 reveal">
-                    <div class="flex items-center justify-between">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-mono">
-                            CHAPTER 07 — REVENUE
-                        </div>
-                        <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-[10px]">LIVE ENGINE</span>
-                    </div>
-
-                    <h3 class="text-2xl font-bold text-white">Revenue Intelligence</h3>
-                    <p class="text-slate-400 text-sm">Real-time demand signal detection and automated pricing optimization.</p>
-
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-3 text-xs">
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400">Demand Signal Detected:</span>
-                            <span class="text-amber-400 font-medium">+35% Search Surge (City Concert)</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400">AI Recommendation:</span>
-                            <span class="text-emerald-400 font-medium">Increase Deluxe Rates by +$45</span>
-                        </div>
-                        <div class="pt-2 border-t border-white/5 flex justify-between text-slate-500 font-mono text-[10px]">
-                            <span>Human Approval Required</span>
-                            <span class="text-blue-400">Auto-execute in 12m</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Procurement Intelligence Card -->
-                <div class="glass-panel p-8 rounded-2xl border border-white/10 space-y-6 reveal">
-                    <div class="flex items-center justify-between">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-mono">
-                            CHAPTER 08 — PROCUREMENT
-                        </div>
-                        <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-[10px]">LIVE ENGINE</span>
-                    </div>
-
-                    <h3 class="text-2xl font-bold text-white">Procurement Intelligence</h3>
-                    <p class="text-slate-400 text-sm">Automated supplier RFQs, quote comparison, and inventory reordering.</p>
-
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-3 text-xs">
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400">Stock Threshold Alert:</span>
-                            <span class="text-red-400 font-medium">Premium Linen Inventory Low</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-slate-400">Vendor Quote Comparison:</span>
-                            <span class="text-white font-medium">3 Vendors Evaluated</span>
-                        </div>
-                        <div class="pt-2 border-t border-white/5 flex justify-between text-slate-500 font-mono text-[10px]">
-                            <span>Recommended: Vendor B (-12% cost)</span>
-                            <span class="text-emerald-400">Approve RFQ →</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- 09. AI WORKFORCE -->
-        <section class="max-w-7xl mx-auto px-4 py-16">
-            <div class="text-center mb-16 reveal">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border border-blue-500/30 text-blue-400 text-xs font-medium mb-4">
-                    CHAPTER 09 — AUTONOMOUS WORKFORCE
-                </div>
-                <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">Specialized AI Agents</h2>
-                <p class="text-slate-400 max-w-2xl mx-auto">Purpose-built intelligent agents working in parallel across departments.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <!-- Agent 1 -->
-                <div class="glass-panel p-6 rounded-2xl border border-white/10 hover:border-blue-500/40 transition-all reveal">
-                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 mb-4">
-                        <i data-lucide="message-square" class="w-5 h-5"></i>
-                    </div>
-                    <h4 class="text-base font-bold text-white mb-1">Guest Agent</h4>
-                    <p class="text-xs text-slate-400 mb-4">Manages guest requests, reservations, and messaging 24/7.</p>
-                    <div class="p-3 rounded-lg bg-slate-900/60 text-[11px] font-mono text-slate-300 space-y-1">
-                        <div class="flex justify-between"><span>Active Chats:</span> <span class="text-blue-400">12</span></div>
-                        <div class="flex justify-between"><span>Resolved Today:</span> <span class="text-emerald-400">142</span></div>
-                    </div>
-                </div>
-
-                <!-- Agent 2 -->
-                <div class="glass-panel p-6 rounded-2xl border border-white/10 hover:border-blue-500/40 transition-all reveal">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 mb-4">
-                        <i data-lucide="activity" class="w-5 h-5"></i>
-                    </div>
-                    <h4 class="text-base font-bold text-white mb-1">Operations Agent</h4>
-                    <p class="text-xs text-slate-400 mb-4">Dispatches tasks to staff and monitors SLA completion timers.</p>
-                    <div class="p-3 rounded-lg bg-slate-900/60 text-[11px] font-mono text-slate-300 space-y-1">
-                        <div class="flex justify-between"><span>Active Tasks:</span> <span class="text-amber-400">8</span></div>
-                        <div class="flex justify-between"><span>Avg SLA:</span> <span class="text-emerald-400">3.8 min</span></div>
-                    </div>
-                </div>
-
-                <!-- Agent 3 -->
-                <div class="glass-panel p-6 rounded-2xl border border-white/10 hover:border-blue-500/40 transition-all reveal">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4">
-                        <i data-lucide="trending-up" class="w-5 h-5"></i>
-                    </div>
-                    <h4 class="text-base font-bold text-white mb-1">Revenue Agent</h4>
-                    <p class="text-xs text-slate-400 mb-4">Continuously updates dynamic pricing and demand forecasts.</p>
-                    <div class="p-3 rounded-lg bg-slate-900/60 text-[11px] font-mono text-slate-300 space-y-1">
-                        <div class="flex justify-between"><span>Price Updates:</span> <span class="text-emerald-400">24/day</span></div>
-                        <div class="flex justify-between"><span>Yield Lift:</span> <span class="text-blue-400">+11.2%</span></div>
-                    </div>
-                </div>
-
-                <!-- Agent 4 -->
-                <div class="glass-panel p-6 rounded-2xl border border-white/10 hover:border-blue-500/40 transition-all reveal">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-4">
-                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                    </div>
-                    <h4 class="text-base font-bold text-white mb-1">Procurement Agent</h4>
-                    <p class="text-xs text-slate-400 mb-4">Monitors stock levels, negotiates quotes, and prepares POs.</p>
-                    <div class="p-3 rounded-lg bg-slate-900/60 text-[11px] font-mono text-slate-300 space-y-1">
-                        <div class="flex justify-between"><span>Pending POs:</span> <span class="text-indigo-400">3</span></div>
-                        <div class="flex justify-between"><span>Savings Index:</span> <span class="text-emerald-400 font-mono">8.4%</span></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 11-12. OPERATING & OPPORTUNITY LOOPS -->
-        <section id="orchestration" class="max-w-7xl mx-auto px-4 py-16">
-            <div class="text-center mb-16 reveal">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border border-blue-500/30 text-blue-400 text-xs font-medium mb-4">
-                    CHAPTER 11–12 — OPERATING & OPPORTUNITY LOOPS
-                </div>
-                <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">The Continuous Operating Loop</h2>
-                <p class="text-slate-400 max-w-2xl mx-auto">Every guest interaction feeds operational intelligence, creating compounding revenue opportunities.</p>
-            </div>
-
-            <div class="glass-panel p-8 rounded-2xl border border-white/10 reveal">
-                <div class="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
-                    <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5 space-y-2">
-                        <span class="text-[10px] font-mono text-blue-400 uppercase">01. SENSE</span>
-                        <div class="text-xs font-bold text-white">Guest Message</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5 space-y-2">
-                        <span class="text-[10px] font-mono text-indigo-400 uppercase">02. UNDERSTAND</span>
-                        <div class="text-xs font-bold text-white">Context & Rules</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5 space-y-2">
-                        <span class="text-[10px] font-mono text-amber-400 uppercase">03. DECIDE</span>
-                        <div class="text-xs font-bold text-white">AI Proposal</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5 space-y-2">
-                        <span class="text-[10px] font-mono text-emerald-400 uppercase">04. ACT</span>
-                        <div class="text-xs font-bold text-white">Team Execution</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5 space-y-2">
-                        <span class="text-[10px] font-mono text-teal-400 uppercase">05. VERIFY</span>
-                        <div class="text-xs font-bold text-white">Audit Log</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/60 border border-white/5 space-y-2">
-                        <span class="text-[10px] font-mono text-purple-400 uppercase">06. LEARN</span>
-                        <div class="text-xs font-bold text-white">Hotel Intelligence</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 13-17. HOTEL OS COMMAND CENTER REVEAL -->
-        <section class="max-w-7xl mx-auto px-4 py-16">
-            <div class="text-center mb-12 reveal">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border border-blue-500/30 text-blue-400 text-xs font-medium mb-4">
-                    CHAPTER 13–17 — COMMAND CENTER
-                </div>
-                <h2 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">Complete Hotel OS Command Center</h2>
-                <p class="text-slate-400 max-w-2xl mx-auto">One single glass dashboard to control every department across your properties.</p>
-            </div>
-
-            <!-- Command Center Full Dashboard Screen Mockup -->
-            <div class="rounded-2xl glass-panel border border-white/10 p-6 shadow-2xl relative reveal space-y-6">
-                <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/10">
-                    <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-amber-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-                        <span class="text-xs font-mono text-slate-400 ml-2">OtonomiQ Hotel OS — Grand Central Flagship</span>
-                    </div>
-                    <div class="flex items-center gap-4 text-xs font-mono text-slate-400">
-                        <span>Properties: <strong class="text-white">4 Active</strong></span>
-                        <span>Permissions: <strong class="text-emerald-400">Admin Control</strong></span>
-                    </div>
-                </div>
-
-                <!-- Live Command Activity Feed Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Column 1: Live Activity Stream -->
-                    <div class="space-y-4 lg:col-span-2">
-                        <h4 class="text-xs font-mono uppercase text-slate-400 tracking-wider">Live System Feed</h4>
-                        
-                        <div class="space-y-2">
-                            <div class="p-3 rounded-xl bg-slate-900/70 border border-white/5 flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-3">
-                                    <span class="font-mono text-slate-500">10:42</span>
-                                    <span class="text-white">Suite 402 Guest Request Resolved</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono text-[10px]">SUCCESS</span>
-                            </div>
-
-                            <div class="p-3 rounded-xl bg-slate-900/70 border border-white/5 flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-3">
-                                    <span class="font-mono text-slate-500">10:39</span>
-                                    <span class="text-white">Revenue Strategy: Weekend BAR Rates +8%</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-[10px]">AUTO-APPLIED</span>
-                            </div>
-
-                            <div class="p-3 rounded-xl bg-slate-900/70 border border-white/5 flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-3">
-                                    <span class="font-mono text-slate-500">10:35</span>
-                                    <span class="text-white">Procurement PO #8892 Sent to Supplier B</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-mono text-[10px]">PENDING APPROVAL</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Column 2: Management Intelligence Brief -->
-                    <div class="space-y-4">
-                        <h4 class="text-xs font-mono uppercase text-slate-400 tracking-wider">Management Intelligence</h4>
-                        <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-3 text-xs">
-                            <div class="text-slate-300">Daily Forecast Summary:</div>
-                            <div class="text-2xl font-bold text-white">$48,290 <span class="text-xs font-normal text-emerald-400 font-mono">+8.4% target</span></div>
-                            <div class="pt-2 border-t border-white/5 text-slate-400 text-[11px]">
-                                AI suggests opening 5 extra Spa slots for afternoon demand peak.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 18. FINAL CTA -->
-        <section id="cta" class="max-w-5xl mx-auto px-4 py-24 text-center">
-            <div class="glass-panel p-12 md:p-16 rounded-3xl border border-blue-500/20 relative overflow-hidden reveal">
-                <div class="glow-effect top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/20"></div>
-
-                <div class="relative z-10 space-y-8">
-                    <h2 class="text-3xl md:text-6xl font-extrabold text-white tracking-tight">
-                        Ready to experience your Hotel OS?
+                    <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">
+                        Unstructured messages become structured action.
                     </h2>
-
-                    <p class="text-slate-300 text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
-                        Start with an operational challenge. Experience it inside OtonomiQ. See what changes when intelligence can actually move the operation.
+                    <p class="text-slate-300 text-base leading-relaxed">
+                        The AI Concierge analyzes context, loyalty status, house policy, and inventory simultaneously before formulating recommendations.
                     </p>
+                </div>
 
-                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                        <a href="mailto:hello@otonomiq.com" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm tracking-wide transition-all shadow-xl shadow-blue-600/30">
-                            Experience OtonomiQ →
-                        </a>
-                        <a href="mailto:contact@otonomiq.com" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel hover:bg-white/5 text-slate-200 font-semibold text-sm tracking-wide transition-all border border-white/10">
-                            Talk to Our Team
-                        </a>
+                <!-- Chat & Context UI Card -->
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full bg-blue-600/30 border border-blue-400 flex items-center justify-center font-bold text-xs text-white">AK</div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-white">Alexander Knight</h4>
+                                <p class="text-[11px] text-amber-400 font-mono">★ VIP Titanium — Suite 402</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono">LIVE MATCH</span>
                     </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900/80 text-sm text-slate-200 border border-white/5">
+                        “Can I get a late checkout at 2 PM tomorrow, and could you book dinner for two at the rooftop at 8 PM?”
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 space-y-2 text-xs">
+                        <div class="text-blue-300 font-bold flex items-center gap-2">
+                            <i data-lucide="cpu" class="w-4 h-4"></i> AI Reasoning & Policy Check
+                        </div>
+                        <p class="text-slate-300">Late checkout approved (2 PM within Titanium policy rules). Rooftop table reserved for 20:00.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: WORKFLOW ORCHESTRATION -->
+        <section id="step-2" class="min-h-screen flex items-center max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+                <!-- Task Card -->
+                <div class="glass-card p-6 rounded-2xl space-y-4 order-2 lg:order-1">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                        <span class="text-xs font-mono text-amber-400 font-bold">TASK #TK-8849</span>
+                        <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 font-mono text-[11px]">SLA: 12:40 left</span>
+                    </div>
+
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between py-2 border-b border-white/5 text-slate-300">
+                            <span>Department:</span>
+                            <span class="text-white font-medium">Housekeeping / Keycard Sync</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-white/5 text-slate-300">
+                            <span>Target Room:</span>
+                            <span class="text-white font-medium">Suite 402</span>
+                        </div>
+                        <div class="flex justify-between py-2 text-slate-300">
+                            <span>Action:</span>
+                            <span class="text-emerald-400 font-medium">Auto-extend lock key until 14:00</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 flex gap-3">
+                        <button class="w-full py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-all shadow-lg shadow-emerald-600/20">
+                            Approve Action
+                        </button>
+                        <button class="px-4 py-2.5 rounded-lg glass-panel hover:bg-white/5 text-slate-300 text-xs">
+                            Modify
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-6 order-1 lg:order-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-mono">
+                        CHAPTER 05 & 06 — WORKFLOW ORCHESTRATION
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">
+                        From AI insight to live operational execution.
+                    </h2>
+                    <p class="text-slate-300 text-base leading-relaxed">
+                        Tasks are dynamically dispatched to department staff with live SLA tracking and human-in-the-loop controls.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: REVENUE INTELLIGENCE -->
+        <section id="step-3" class="min-h-screen flex items-center max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+                <div class="space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-mono">
+                        CHAPTER 07 — REVENUE INTELLIGENCE
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">
+                        Continuous yield & dynamic rate optimization.
+                    </h2>
+                    <p class="text-slate-300 text-base leading-relaxed">
+                        Detect local market demand spikes instantly and trigger automated dynamic price updates with complete revenue manager oversight.
+                    </p>
+                </div>
+
+                <!-- Revenue Dashboard Card -->
+                <div class="glass-card p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                        <span class="text-xs font-mono text-emerald-400 font-bold">REVENUE SIGNAL DETECTED</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">+14.2% REVPAR</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 text-center">
+                        <div class="p-3 rounded-xl bg-slate-900/80 border border-white/5">
+                            <span class="text-[10px] text-slate-400 uppercase font-mono">Occupancy</span>
+                            <div class="text-xl font-bold text-white mt-1">92.4%</div>
+                        </div>
+                        <div class="p-3 rounded-xl bg-slate-900/80 border border-white/5">
+                            <span class="text-[10px] text-slate-400 uppercase font-mono">ADR Forecast</span>
+                            <div class="text-xl font-bold text-emerald-400 mt-1">$384</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5 text-xs text-slate-300 space-y-1">
+                        <div class="flex justify-between">
+                            <span>Concert Surge:</span>
+                            <span class="text-white font-mono">+42% Search Pace</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Recommendation:</span>
+                            <span class="text-emerald-400 font-mono">Increase BAR +$35</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: HOTEL OS COMMAND CENTER -->
+        <section id="step-4" class="min-h-screen flex flex-col justify-center max-w-6xl mx-auto px-4 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border-blue-500/30 text-blue-400 text-xs font-mono mx-auto mb-6">
+                CHAPTER 13 — COMMAND CENTER
+            </div>
+
+            <h2 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6">
+                Complete Operating Command
+            </h2>
+            <p class="text-slate-300 text-lg max-w-2xl mx-auto mb-10">
+                All guest requests, operational tasks, revenue signals, and AI agents unified into one interface.
+            </p>
+
+            <!-- Command Center Big Mockup -->
+            <div class="glass-card p-6 md:p-8 rounded-3xl border border-white/10 text-left space-y-6">
+                <div class="flex items-center justify-between pb-4 border-b border-white/10 text-xs text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="font-mono text-white">HOTEL OS COMMAND — ONLINE</span>
+                    </div>
+                    <span class="font-mono text-blue-400">4 PROPERTIES ACTIVE</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
+                        <span class="text-slate-400 font-mono text-[10px]">GUEST ENGAGEMENT</span>
+                        <div class="text-2xl font-bold text-white">18 Active Chats</div>
+                        <p class="text-slate-400">0 Escalations required</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
+                        <span class="text-slate-400 font-mono text-[10px]">OPERATIONS SLA</span>
+                        <div class="text-2xl font-bold text-emerald-400">98.2%</div>
+                        <p class="text-slate-400">Avg Resolution: 4.1 mins</p>
+                    </div>
+
+                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
+                        <span class="text-slate-400 font-mono text-[10px]">AI AGENT WORKFORCE</span>
+                        <div class="text-2xl font-bold text-blue-400">5 Autonomous Agents</div>
+                        <p class="text-slate-400">342 Executions today</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA SECTION -->
+        <section id="cta" class="max-w-4xl mx-auto px-4 py-20 text-center">
+            <div class="glass-card p-12 rounded-3xl border border-blue-500/30 space-y-6">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
+                    Ready to experience your Hotel OS?
+                </h2>
+                <p class="text-slate-300 text-base max-w-xl mx-auto">
+                    Start with an operational challenge. Experience it inside OtonomiQ.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+                    <a href="mailto:contact@otonomiq.com" class="px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-xl shadow-blue-600/30">
+                        Experience OtonomiQ →
+                    </a>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER -->
-    <footer class="border-t border-white/5 py-8 text-center text-xs text-slate-500 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>© 2026 OtonomiQ Inc. All rights reserved.</div>
-            <div class="flex items-center gap-6 text-slate-400">
-                <span class="hover:text-white cursor-pointer">Privacy Policy</span>
-                <span class="hover:text-white cursor-pointer">Terms of Service</span>
-                <span class="hover:text-white cursor-pointer">Security Overview</span>
-            </div>
-        </div>
-    </footer>
-
-    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <!-- THREE.JS 3D PARALLAX SCENE SCRIPT -->
     <script>
         // Initialize Lucide Icons
         lucide.createIcons();
 
-        // Step Navigation Controller for Interactive Section
-        let currentStep = 1;
-        const totalSteps = 4;
+        // Step coordinates for 3D camera flight targets
+        const cameraSteps = [
+            { x: 0, y: 0, z: 8, rx: 0, ry: 0 },         // Step 0: Hero
+            { x: -3, y: -6, z: 5, rx: 0.2, ry: -0.3 },   // Step 1: Guest AI
+            { x: 4, y: -12, z: 6, rx: -0.1, ry: 0.4 },   // Step 2: Workflows
+            { x: -2, y: -18, z: 4, rx: 0.3, ry: -0.2 },   // Step 3: Revenue
+            { x: 0, y: -24, z: 7, rx: 0, ry: 0 }         // Step 4: Command
+        ];
 
-        function setActiveStep(stepNumber) {
-            currentStep = stepNumber;
+        let currentStepIndex = 0;
+
+        // Three.js Scene Setup
+        const canvas = document.getElementById('webgl-canvas');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x030712, 0.05);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(cameraSteps[0].x, cameraSteps[0].y, cameraSteps[0].z);
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Create Floating 3D Geometric Objects along vertical flight path
+        const geometries = [
+            new THREE.IcosahedronGeometry(1.2, 1),
+            new THREE.TorusKnotGeometry(0.8, 0.25, 100, 16),
+            new THREE.OctahedronGeometry(1.4, 0),
+            new THREE.DodecahedronGeometry(1.2, 0)
+        ];
+
+        const materials = [
+            new THREE.MeshStandardMaterial({ color: 0x3b82f6, wireframe: true }),
+            new THREE.MeshStandardMaterial({ color: 0x6366f1, roughness: 0.3, metalness: 0.8 }),
+            new THREE.MeshStandardMaterial({ color: 0x10b981, wireframe: true }),
+            new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.2, metalness: 0.9 })
+        ];
+
+        const objects = [];
+        const stepPositionsY = [0, -6, -12, -18, -24];
+
+        stepPositionsY.forEach((yPos, index) => {
+            const geo = geometries[index % geometries.length];
+            const mat = materials[index % materials.length];
+            const mesh = new THREE.Mesh(geo, mat);
+
+            // Position left or right based on index
+            const xOffset = (index % 2 === 0) ? 2.5 : -2.5;
+            mesh.position.set(xOffset, yPos, (Math.random() - 0.5) * 2);
+            scene.add(mesh);
+            objects.push(mesh);
+        });
+
+        // Background Starfield Particles
+        const particleCount = 700;
+        const particleGeo = new THREE.BufferGeometry();
+        const particleCoords = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i += 3) {
+            particleCoords[i] = (Math.random() - 0.5) * 30;
+            particleCoords[i + 1] = (Math.random() - 0.5) * 50 - 10;
+            particleCoords[i + 2] = (Math.random() - 0.5) * 20;
+        }
+
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(particleCoords, 3));
+        const particleMat = new THREE.PointsMaterial({
+            size: 0.04,
+            color: 0x60a5fa,
+            transparent: true,
+            opacity: 0.6
+        });
+        const particles = new THREE.Points(particleGeo, particleMat);
+        scene.add(particles);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(0x3b82f6, 3, 20);
+        pointLight1.position.set(5, 5, 5);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0x10b981, 2, 20);
+        pointLight2.position.set(-5, -15, 5);
+        scene.add(pointLight2);
+
+        // Mouse Parallax Effect Variables
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetMouseX = 0;
+        let targetMouseY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            targetMouseX = (e.clientX / window.innerWidth - 0.5) * 0.8;
+            targetMouseY = (e.clientY / window.innerHeight - 0.5) * 0.8;
+        });
+
+        // Smooth Button Navigation Handler
+        function navigateToStep(stepIdx) {
+            currentStepIndex = stepIdx;
             
-            // Hide all step contents
-            for (let i = 1; i <= totalSteps; i++) {
-                const content = document.getElementById(`step-content-${i}`);
-                const btn = document.getElementById(`step-btn-${i}`);
-                
-                if (content && btn) {
-                    if (i === stepNumber) {
-                        content.classList.remove('hidden');
-                        btn.classList.remove('opacity-60', 'border-l-transparent');
-                        btn.classList.add('border-l-blue-500');
-                    } else {
-                        content.classList.add('hidden');
-                        btn.classList.add('opacity-60', 'border-l-transparent');
-                        btn.classList.remove('border-l-blue-500');
-                    }
+            // Update active state on navigation buttons
+            document.querySelectorAll('.step-nav-btn').forEach((btn, idx) => {
+                if (idx === stepIdx) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('text-slate-400');
                 }
-            }
-        }
-
-        function nextStep() {
-            if (currentStep < totalSteps) {
-                setActiveStep(currentStep + 1);
-            } else {
-                setActiveStep(1);
-            }
-        }
-
-        function prevStep() {
-            if (currentStep > 1) {
-                setActiveStep(currentStep - 1);
-            } else {
-                setActiveStep(totalSteps);
-            }
-        }
-
-        // Scroll Intersection Observer for Dynamic Element Reveal (Apple Experience)
-        document.addEventListener("DOMContentLoaded", function () {
-            const revealElements = document.querySelectorAll(".reveal");
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("active");
-                    }
-                });
-            }, {
-                threshold: 0.15
             });
 
-            revealElements.forEach((el) => observer.observe(el));
+            // Scroll page smoothly to target HTML section
+            const targetSection = document.getElementById(`step-${stepIdx}`);
+            if (targetSection) {
+                targetSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Scroll Position Listener to update active step
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const calculatedStep = Math.min(
+                Math.floor((scrollY + windowHeight * 0.4) / windowHeight),
+                cameraSteps.length - 1
+            );
+
+            if (calculatedStep !== currentStepIndex && calculatedStep >= 0) {
+                currentStepIndex = calculatedStep;
+                document.querySelectorAll('.step-nav-btn').forEach((btn, idx) => {
+                    if (idx === currentStepIndex) {
+                        btn.classList.add('bg-blue-600', 'text-white');
+                        btn.classList.remove('text-slate-400');
+                    } else {
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                        btn.classList.add('text-slate-400');
+                    }
+                });
+            }
+        });
+
+        // Animation Loop (Render & Smooth Camera Lerp)
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+
+            // Rotate 3D Geometries
+            objects.forEach((obj, idx) => {
+                obj.rotation.x = elapsedTime * 0.3 * (idx % 2 === 0 ? 1 : -1);
+                obj.rotation.y = elapsedTime * 0.4;
+            });
+
+            // Smooth mouse interpolation (inertia)
+            mouseX += (targetMouseX - mouseX) * 0.05;
+            mouseY += (targetMouseY - mouseY) * 0.05;
+
+            // Camera flight target lerping based on step index
+            const targetCam = cameraSteps[currentStepIndex];
+
+            camera.position.x += (targetCam.x + mouseX - camera.position.x) * 0.04;
+            camera.position.y += (targetCam.y - mouseY - camera.position.y) * 0.04;
+            camera.position.z += (targetCam.z - camera.position.z) * 0.04;
+
+            camera.rotation.x += (targetCam.rx - camera.rotation.x) * 0.04;
+            camera.rotation.y += (targetCam.ry - camera.rotation.y) * 0.04;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Responsive Resize Handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
-
 </body>
 </html>
