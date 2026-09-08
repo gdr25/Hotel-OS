@@ -1,856 +1,1160 @@
 <!DOCTYPE html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OtonomiQ Hotel OS — Interactive 3D Experience & Command Flow</title>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Three.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <!-- Google Fonts -->
+    <title>OtonomiQ Hotel OS — Intelligence That Moves The Hotel</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    colors: {
-                        brand: {
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            950: '#030712',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #030712;
-            color: #f8fafc;
-            overflow-x: hidden;
+        /* --------------------------------------------------
+         * DESIGN SYSTEM & VARIABLES
+         * -------------------------------------------------- */
+        :root {
+            --bg-obsidian: #08090C;
+            --bg-near-black: #0D0F14;
+            --bg-deep-charcoal: #13161F;
+            --bg-soft-graphite: #1A1E2B;
+            --surface-card: rgba(22, 26, 38, 0.65);
+            --surface-card-hover: rgba(30, 36, 52, 0.8);
+            --surface-glass: rgba(255, 255, 255, 0.03);
+            --border-light: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(0, 229, 255, 0.25);
+            
+            --accent-blue: #0088FF;
+            --accent-teal: #00E5FF;
+            --accent-teal-glow: rgba(0, 229, 255, 0.15);
+            --accent-amber: #FFB000;
+            --accent-emerald: #00E676;
+            
+            --text-primary: #F0F4F8;
+            --text-secondary: #8E9BAE;
+            --text-muted: #525E71;
+            
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-pill: 999px;
+            
+            --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-smooth: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* --------------------------------------------------
+         * BASE & RESET
+         * -------------------------------------------------- */
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-        /* Fixed Three.js WebGL Canvas */
-        #webgl-canvas {
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--bg-obsidian);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        body {
+            position: relative;
+            background: radial-gradient(circle at 50% 0%, #111726 0%, var(--bg-obsidian) 70%);
+        }
+
+        ::selection {
+            background: var(--accent-teal);
+            color: var(--bg-obsidian);
+        }
+
+        /* Typography Helpers */
+        .mono { font-family: var(--font-mono); }
+        .eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent-teal);
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .eyebrow::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            box-shadow: 0 0 10px var(--accent-teal);
+        }
+
+        h1, h2, h3 {
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 0;
             pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
         }
 
-        /* Glassmorphism Surface Design */
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        /* Layout Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
         }
 
-        .glass-card {
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        /* --------------------------------------------------
+         * UI COMPONENTS & BADGES
+         * -------------------------------------------------- */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
         }
-
-        .glass-card:hover {
-            border-color: rgba(59, 130, 246, 0.4);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(59, 130, 246, 0.15);
-        }
-
-        /* Pulse ring animation */
-        @keyframes ring-pulse {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 0.4; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-        .pulse-ring {
-            animation: ring-pulse 3s infinite ease-in-out;
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
+        .badge-dot {
             width: 6px;
+            height: 6px;
+            border-radius: 50%;
         }
-        ::-webkit-scrollbar-track {
-            background: #030712;
+        .badge-live .badge-dot { background: var(--accent-teal); box-shadow: 0 0 8px var(--accent-teal); }
+        .badge-config .badge-dot { background: var(--accent-amber); }
+        .badge-roadmap .badge-dot { background: var(--text-muted); }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: var(--radius-pill);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            border: none;
+            outline: none;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 3px;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 4px 20px var(--accent-teal-glow);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(0, 229, 255, 0.35);
+        }
+        .btn-secondary {
+            background: var(--surface-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover {
+            background: var(--surface-card-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* --------------------------------------------------
+         * HEADER / NAV
+         * -------------------------------------------------- */
+        header {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            padding: 0 1rem;
+        }
+        .nav-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1000px;
+            padding: 8px 16px 8px 24px;
+            background: rgba(13, 15, 20, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-pill);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.02em;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-teal);
+            border-radius: 50%;
+        }
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: var(--transition-fast);
+        }
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* --------------------------------------------------
+         * HERO SECTION & FLOATING DASHBOARD
+         * -------------------------------------------------- */
+        .hero {
+            padding-top: 160px;
+            padding-bottom: 100px;
+            text-align: center;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            font-weight: 400;
+        }
+        .hero-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 4rem;
+        }
+
+        /* Hero Dashboard Container */
+        .dashboard-hero-wrapper {
+            position: relative;
+            max-width: 1100px;
+            margin: 0 auto;
+            perspective: 1200px;
+        }
+
+        .hero-dashboard {
+            background: var(--bg-deep-charcoal);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.8), 0 0 80px rgba(0, 229, 255, 0.08);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 220px 1fr 300px;
+            height: 580px;
+            text-align: left;
+            transition: transform var(--transition-smooth);
+            transform: rotateX(4deg);
+            transform-origin: center top;
+        }
+
+        /* Sidebar UI */
+        .dash-sidebar {
+            background: rgba(13, 15, 20, 0.6);
+            border-right: 1px solid var(--border-light);
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .dash-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.825rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .dash-nav-item:hover, .dash-nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+        .dash-nav-item.active {
+            border-left: 2px solid var(--accent-teal);
+            background: linear-gradient(90deg, rgba(0, 229, 255, 0.1), transparent);
+        }
+
+        /* Main Workspace UI */
+        .dash-main {
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: rgba(8, 9, 12, 0.4);
+        }
+        .dash-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .metric-card {
+            background: var(--surface-glass);
+            border: 1px solid var(--border-light);
+            padding: 14px;
+            border-radius: var(--radius-md);
+        }
+        .metric-card .title { font-size: 0.75rem; color: var(--text-muted); }
+        .metric-card .value { font-size: 1.3rem; font-weight: 600; margin-top: 4px; color: var(--text-primary); }
+
+        /* Activity Feed Table */
+        .dash-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .dash-table th {
+            text-align: left;
+            padding: 10px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 500;
+        }
+        .dash-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+        }
+
+        /* Right AI Activity Panel */
+        .dash-ai-panel {
+            background: rgba(13, 15, 20, 0.8);
+            border-left: 1px solid var(--border-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .ai-status-box {
+            background: rgba(0, 229, 255, 0.03);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius-md);
+            padding: 14px;
+        }
+
+        /* Floating Overlays around Dashboard */
+        .floating-card {
+            position: absolute;
+            background: rgba(19, 22, 31, 0.9);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            backdrop-filter: blur(12px);
+            z-index: 10;
+            font-size: 0.8rem;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+        .fc-1 { top: -20px; left: -30px; animation-delay: 0s; }
+        .fc-2 { bottom: 40px; right: -40px; animation-delay: 2s; }
+        .fc-3 { top: 40%; right: -50px; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+        }
+
+        /* --------------------------------------------------
+         * INTERACTIVE STORYTELLING SECTIONS
+         * -------------------------------------------------- */
+        .story-section {
+            padding: 120px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .split-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .story-content h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+        .story-content p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* Interactive Demo Card Containers */
+        .demo-window {
+            background: var(--bg-deep-charcoal);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* Chat / Request UI */
+        .chat-bubble {
+            background: var(--surface-soft);
+            border: 1px solid var(--border-light);
+            padding: 16px;
+            border-radius: 16px 16px 16px 4px;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .ai-processing-card {
+            background: rgba(0, 229, 255, 0.04);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        /* Workflow Pipeline Nodes */
+        .workflow-nodes {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            margin: 40px 0;
+        }
+        .workflow-nodes::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-light);
+            z-index: 0;
+        }
+        .wf-node {
+            position: relative;
+            z-index: 1;
+            background: var(--bg-near-black);
+            border: 1px solid var(--border-light);
+            padding: 8px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            transition: var(--transition-smooth);
+        }
+        .wf-node.active {
+            border-color: var(--accent-teal);
+            color: var(--accent-teal);
+            box-shadow: 0 0 15px var(--accent-teal-glow);
+            background: var(--bg-deep-charcoal);
+        }
+
+        /* Task SLA Card */
+        .task-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* --------------------------------------------------
+         * AI WORKFORCE AGENT CARDS
+         * -------------------------------------------------- */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        .agent-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .agent-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-teal);
+            background: var(--surface-card-hover);
+        }
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .agent-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* --------------------------------------------------
+         * OPERATING LOOP SECTION
+         * -------------------------------------------------- */
+        .loop-sequence {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-width: 800px;
+            margin: 40px auto 0;
+        }
+        .loop-step {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            background: var(--surface-glass);
+            border: 1px solid var(--border-light);
+            padding: 20px 28px;
+            border-radius: var(--radius-md);
+            transition: var(--transition-fast);
+        }
+        .loop-step:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .loop-step .step-word {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+            width: 140px;
+        }
+
+        /* --------------------------------------------------
+         * COMMAND CENTER INTERACTIVE MODULE TRANSFORMER
+         * -------------------------------------------------- */
+        .command-center {
+            text-align: center;
+            padding: 100px 0;
+        }
+        .module-nav {
+            display: inline-flex;
+            gap: 8px;
+            background: var(--bg-deep-charcoal);
+            padding: 6px;
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--border-light);
+            margin: 30px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .module-btn {
+            padding: 8px 18px;
+            border-radius: var(--radius-pill);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .module-btn.active {
+            background: var(--accent-teal);
+            color: #000;
+            font-weight: 600;
+        }
+
+        .cmd-viewport {
+            min-height: 400px;
+            background: var(--bg-deep-charcoal);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            text-align: left;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+            transition: var(--transition-smooth);
+        }
+
+        /* --------------------------------------------------
+         * FINAL CTA & FOOTER
+         * -------------------------------------------------- */
+        .cta-section {
+            padding: 140px 0;
+            text-align: center;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.08) 0%, transparent 60%);
+        }
+        .cta-section h2 {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 1rem;
+        }
+        .cta-section p {
+            color: var(--text-secondary);
+            max-width: 550px;
+            margin: 0 auto 2.5rem;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-light);
+            padding: 40px 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* --------------------------------------------------
+         * RESPONSIVE DESIGN
+         * -------------------------------------------------- */
+        @media (max-width: 992px) {
+            .hero-dashboard {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .dash-sidebar, .dash-ai-panel { display: none; }
+            .split-grid { grid-template-columns: 1fr; gap: 40px; }
+            .nav-links { display: none; }
+            .floating-card { display: none; }
         }
     </style>
 </head>
-<body class="font-sans antialiased selection:bg-blue-500 selection:text-white">
+<body>
 
-    <!-- THREE.JS CANVAS BACKGROUND -->
-    <canvas id="webgl-canvas"></canvas>
+    <!-- Canvas Background Network Effects -->
+    <canvas id="bg-canvas"></canvas>
 
-    <!-- TOP NAVIGATION BAR -->
-    <nav class="fixed top-0 inset-x-0 z-50 glass-panel border-b border-white/10 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">O</div>
-                <span class="font-bold tracking-tight text-lg text-white">OtonomiQ <span class="text-xs font-medium text-blue-400 uppercase tracking-widest ml-1">Hotel OS</span></span>
+    <!-- Floating Navigation Bar -->
+    <header>
+        <nav class="nav-pill">
+            <div class="brand">
+                <div class="brand-dot"></div>
+                OtonomiQ
+            </div>
+            <ul class="nav-links">
+                <li><a href="#guest">Guest</a></li>
+                <li><a href="#operations">Operations</a></li>
+                <li><a href="#revenue">Revenue</a></li>
+                <li><a href="#workforce">AI Workforce</a></li>
+            </ul>
+            <a href="#cta" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.8rem;">Experience OtonomiQ →</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section class="hero container">
+            <div class="eyebrow">OTONOMIQ HOTEL OS</div>
+            <h1>Intelligence that moves the hotel.</h1>
+            <p>One operating layer connecting guests, teams, workflows and AI.</p>
+            <div class="hero-cta">
+                <a href="#cta" class="btn btn-primary">Experience Hotel OS →</a>
+                <a href="#command-center" class="btn btn-secondary">Explore the platform</a>
             </div>
 
-            <!-- Experience Controller Step Quick Nav Buttons -->
-            <div class="hidden xl:flex items-center gap-1.5 p-1 rounded-full glass-panel border-white/5 text-[11px]">
-                <button onclick="navigateToStep(0)" id="nav-btn-0" class="step-nav-btn px-3 py-1 rounded-full bg-blue-600 text-white font-medium transition-all">01 Hero</button>
-                <button onclick="navigateToStep(1)" id="nav-btn-1" class="step-nav-btn px-3 py-1 rounded-full text-slate-400 hover:text-white transition-all">02 Modules</button>
-                <button onclick="navigateToStep(2)" id="nav-btn-2" class="step-nav-btn px-3 py-1 rounded-full text-slate-400 hover:text-white transition-all">03 Guest AI</button>
-                <button onclick="navigateToStep(3)" id="nav-btn-3" class="step-nav-btn px-3 py-1 rounded-full text-slate-400 hover:text-white transition-all">04 Operations</button>
-                <button onclick="navigateToStep(4)" id="nav-btn-4" class="step-nav-btn px-3 py-1 rounded-full text-slate-400 hover:text-white transition-all">05 Revenue</button>
-                <button onclick="navigateToStep(5)" id="nav-btn-5" class="step-nav-btn px-3 py-1 rounded-full text-slate-400 hover:text-white transition-all">06 Procurement</button>
-                <button onclick="navigateToStep(6)" id="nav-btn-6" class="step-nav-btn px-3 py-1 rounded-full text-slate-400 hover:text-white transition-all">07 Operating Loop</button>
-                <button onclick="navigateToStep(7)" id="nav-btn-7" class="step-nav-btn px-3 py-1 rounded-full text-slate-400 hover:text-white transition-all">08 Live Flow</button>
-            </div>
-
-            <a href="#dashboard-flow" class="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold tracking-wide transition-all shadow-lg shadow-blue-600/30 flex items-center gap-2">
-                <span>Interactive Flow</span>
-                <i data-lucide="play-circle" class="w-3.5 h-3.5"></i>
-            </a>
-        </div>
-    </nav>
-
-    <!-- MAIN OVERLAY CONTENT -->
-    <main class="relative z-10 space-y-40 pb-32 pt-28">
-
-        <!-- 01. HERO SECTION -->
-        <section id="step-0" class="min-h-screen flex flex-col justify-center items-center px-4 max-w-6xl mx-auto text-center relative">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border-blue-500/30 text-blue-400 text-xs font-mono mb-6">
-                <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
-                01. HERO — ENTER HOTEL OS
-            </div>
-
-            <h1 class="text-5xl md:text-8xl font-extrabold tracking-tight text-white max-w-5xl leading-[1.08] mb-8">
-                Intelligence that <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-300 to-emerald-400">actually moves</span> the hotel.
-            </h1>
-
-            <p class="text-slate-300 text-lg md:text-xl max-w-2xl font-light leading-relaxed mb-12">
-                A single visual operating system orchestrating Guest Intelligence, Task SLAs, Revenue Optimization, and AI Agents in real time.
-            </p>
-
-            <div class="flex flex-col sm:flex-row items-center gap-4">
-                <button onclick="navigateToStep(7)" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm tracking-wide transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-3">
-                    <span>Try Interactive Dashboard Flow</span>
-                    <i data-lucide="sparkles" class="w-4 h-4"></i>
-                </button>
-                <button onclick="navigateToStep(1)" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel hover:bg-white/5 text-slate-200 font-medium text-sm transition-all border border-white/10">
-                    Explore Ecosystem →
-                </button>
-            </div>
-        </section>
-
-        <!-- 02. MEET HOTEL OS — ECOSYSTEM MODULES -->
-        <section id="step-1" class="min-h-screen flex items-center max-w-6xl mx-auto px-4">
-            <div class="w-full space-y-12">
-                <div class="text-center max-w-2xl mx-auto space-y-4">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono">
-                        02. MEET HOTEL OS
-                    </div>
-                    <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">The Complete Operating Architecture</h2>
-                    <p class="text-slate-400 text-sm">Modules activate dynamically, replacing disconnected legacy hotel software silos.</p>
+            <!-- HERO DASHBOARD PRODUCT PREVIEW -->
+            <div class="dashboard-hero-wrapper">
+                <!-- Floating Ambient Cards -->
+                <div class="floating-card fc-1">
+                    <span class="badge badge-live"><span class="badge-dot"></span> Guest Intelligence</span>
+                    <div style="margin-top: 6px; font-weight: 500;">"Late checkout requested"</div>
+                    <div style="color: var(--accent-teal); font-size: 0.75rem; margin-top: 4px;">AI Recommendation Ready</div>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
-                    <div class="glass-card p-4 rounded-xl text-center space-y-2 border border-white/10">
-                        <i data-lucide="message-square" class="w-5 h-5 text-blue-400 mx-auto"></i>
-                        <div class="text-xs font-bold text-white">Guest</div>
-                        <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">LIVE</span>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl text-center space-y-2 border border-white/10">
-                        <i data-lucide="sliders" class="w-5 h-5 text-amber-400 mx-auto"></i>
-                        <div class="text-xs font-bold text-white">Operations</div>
-                        <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">LIVE</span>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl text-center space-y-2 border border-white/10">
-                        <i data-lucide="trending-up" class="w-5 h-5 text-emerald-400 mx-auto"></i>
-                        <div class="text-xs font-bold text-white">Revenue</div>
-                        <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">LIVE</span>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl text-center space-y-2 border border-white/10">
-                        <i data-lucide="shopping-cart" class="w-5 h-5 text-indigo-400 mx-auto"></i>
-                        <div class="text-xs font-bold text-white">Procurement</div>
-                        <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">LIVE</span>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl text-center space-y-2 border border-white/10">
-                        <i data-lucide="utensils" class="w-5 h-5 text-purple-400 mx-auto"></i>
-                        <div class="text-xs font-bold text-white">F&B</div>
-                        <span class="text-[9px] font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">CONFIG</span>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl text-center space-y-2 border border-white/10">
-                        <i data-lucide="pie-chart" class="w-5 h-5 text-teal-400 mx-auto"></i>
-                        <div class="text-xs font-bold text-white">Finance</div>
-                        <span class="text-[9px] font-mono text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">CONFIG</span>
-                    </div>
-                    <div class="glass-card p-4 rounded-xl text-center space-y-2 border border-white/10">
-                        <i data-lucide="shield" class="w-5 h-5 text-rose-400 mx-auto"></i>
-                        <div class="text-xs font-bold text-white">Management</div>
-                        <span class="text-[9px] font-mono text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">ROADMAP</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 03-04. GUEST INTELLIGENCE & AI CONCIERGE -->
-        <section id="step-2" class="min-h-screen flex items-center max-w-6xl mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
-                <div class="space-y-6">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-mono">
-                        03 & 04. GUEST INTELLIGENCE & CONCIERGE
-                    </div>
-                    <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">
-                        Unstructured chats become structured data.
-                    </h2>
-                    <p class="text-slate-300 text-base leading-relaxed">
-                        When a guest asks for late checkout and dinner, OtonomiQ doesn't just read words—it evaluates guest status, room policy, and restaurant seat availability in one pass.
-                    </p>
+                <div class="floating-card fc-2">
+                    <span class="badge badge-live"><span class="badge-dot"></span> Revenue Intelligence</span>
+                    <div style="margin-top: 6px; font-weight: 500;">Demand Signal Detected</div>
+                    <div style="color: var(--text-secondary); font-size: 0.75rem; margin-top: 4px;">+14% Surge Pace</div>
                 </div>
 
-                <div class="glass-card p-6 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-full bg-blue-600/30 border border-blue-400 flex items-center justify-center font-bold text-xs text-white">AK</div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-white">Alexander Knight</h4>
-                                <p class="text-[11px] text-amber-400 font-mono">★ VIP Titanium — Suite 402</p>
+                <div class="floating-card fc-3">
+                    <span class="badge badge-config"><span class="badge-dot"></span> Operations</span>
+                    <div style="margin-top: 6px; font-weight: 500;">Task #OT-2841</div>
+                    <div style="color: var(--accent-amber); font-size: 0.75rem; margin-top: 4px;">SLA 08:42 Remaining</div>
+                </div>
+
+                <div class="hero-dashboard" id="hero-dash">
+                    <!-- Left Sidebar Nav -->
+                    <div class="dash-sidebar">
+                        <div class="dash-nav-item active">Overview</div>
+                        <div class="dash-nav-item">Guest Ops</div>
+                        <div class="dash-nav-item">Operations</div>
+                        <div class="dash-nav-item">Revenue</div>
+                        <div class="dash-nav-item">Procurement</div>
+                        <div class="dash-nav-item">F&amp;B Hub</div>
+                        <div class="dash-nav-item">AI Workforce</div>
+                        <div class="dash-nav-item">Settings</div>
+                    </div>
+
+                    <!-- Main Dashboard Workspace -->
+                    <div class="dash-main">
+                        <div class="dash-metrics">
+                            <div class="metric-card">
+                                <div class="title">Guest Requests</div>
+                                <div class="value">42 Active</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="title">Active Tasks</div>
+                                <div class="value">18 Pending</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="title">Revenue Signals</div>
+                                <div class="value">3 Actionable</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="title">AI Activity</div>
+                                <div class="value" style="color: var(--accent-teal);">99.4% Sync</div>
                             </div>
                         </div>
-                        <span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono">RECOGNIZED</span>
-                    </div>
 
-                    <div class="p-4 rounded-xl bg-slate-900/80 text-sm text-slate-200 border border-white/5">
-                        “Can I get a late checkout at 2 PM tomorrow, and could you book dinner for two at the rooftop at 8 PM?”
-                    </div>
-
-                    <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 space-y-2 text-xs">
-                        <div class="text-blue-300 font-bold flex items-center gap-2">
-                            <i data-lucide="cpu" class="w-4 h-4"></i> Context & Policy Engine Output
+                        <!-- Live Operations Stream -->
+                        <div style="background: var(--surface-glass); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <span style="font-size: 0.85rem; font-weight: 600;">Live Operational Feed</span>
+                                <span class="badge badge-live"><span class="badge-dot"></span> STREAMING</span>
+                            </div>
+                            <table class="dash-table">
+                                <thead>
+                                    <tr>
+                                        <th>Source</th>
+                                        <th>Event / Context</th>
+                                        <th>AI Action</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Alex Morgan (R1208)</td>
+                                        <td>Late Checkout &amp; Dinner Req.</td>
+                                        <td>Policy Check &amp; Slot Match</td>
+                                        <td><span style="color: var(--accent-teal);">Ready Approval</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Revenue Engine</td>
+                                        <td>Weekend Occupancy Spike</td>
+                                        <td>Dynamic Pricing Adjustment</td>
+                                        <td><span style="color: var(--accent-amber);">Pending Review</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Housekeeping</td>
+                                        <td>Room 1402 Cleared</td>
+                                        <td>Auto Check-in Alert Sent</td>
+                                        <td><span style="color: var(--accent-emerald);">Completed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <ul class="space-y-1 text-slate-300 font-mono text-[11px]">
-                            <li>✓ VIP Late Checkout Eligibility: Approved (2 PM)</li>
-                            <li>✓ Next Suite Reservation: 16:00 (No Conflict)</li>
-                            <li>✓ Rooftop Dining: Table available for 2 @ 20:00</li>
-                        </ul>
+                    </div>
+
+                    <!-- Right AI Panel -->
+                    <div class="dash-ai-panel">
+                        <span style="font-size: 0.85rem; font-weight: 600;">AI Context Engine</span>
+                        <div class="ai-status-box">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">ACTIVE ANALYSIS</div>
+                            <div style="font-size: 0.85rem; margin-top: 6px; font-weight: 500;">Analyzing Alex Morgan (R1208)</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px;">• Context: 3-night VIP stay<br>• Room status: Clean<br>• Rest. table 8 PM: Available</div>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 0.8rem;">Human Approve →</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 05-06. WORKFLOW & TASK MANAGEMENT -->
-        <section id="step-3" class="min-h-screen flex items-center max-w-6xl mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
-                <div class="glass-card p-6 rounded-2xl space-y-4 order-2 lg:order-1">
-                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                        <span class="text-xs font-mono text-amber-400 font-bold">TASK #TK-9042</span>
-                        <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 font-mono text-[11px]">SLA TIMER: 14:10</span>
-                    </div>
-
-                    <div class="space-y-2 text-xs">
-                        <div class="flex justify-between py-2 border-b border-white/5 text-slate-300">
-                            <span>Department:</span>
-                            <span class="text-white font-medium">Front Desk & Housekeeping</span>
-                        </div>
-                        <div class="flex justify-between py-2 border-b border-white/5 text-slate-300">
-                            <span>Priority:</span>
-                            <span class="text-amber-400 font-medium">High (VIP Titanium)</span>
-                        </div>
-                        <div class="flex justify-between py-2 text-slate-300">
-                            <span>PMS Lock Sync:</span>
-                            <span class="text-emerald-400 font-medium">Auto-extend keycard to 14:00</span>
-                        </div>
-                    </div>
-
-                    <div class="p-3 rounded-lg bg-slate-900/80 border border-white/5 text-[11px] font-mono text-slate-400 flex items-center justify-between">
-                        <span>Workflow Status:</span>
-                        <span class="text-blue-400">In Progress → Staff Assigned</span>
-                    </div>
+        <!-- SECTION 02: ONE REQUEST STORY -->
+        <section class="story-section container" id="guest">
+            <div class="split-grid">
+                <div class="story-content">
+                    <div class="eyebrow">01 / CONTEXT &amp; INTENT</div>
+                    <h2>One guest request.</h2>
+                    <p>OtonomiQ turns unstructured conversation into coordinated, high-precision action instantly.</p>
+                    <div class="badge badge-live"><span class="badge-dot"></span> GUEST INTELLIGENCE LIVE</div>
                 </div>
 
-                <div class="space-y-6 order-1 lg:order-2">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-mono">
-                        05 & 06. WORKFLOW & TASK SLA
+                <div class="demo-window">
+                    <div class="chat-bubble">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Alex Morgan • Room 1208</div>
+                        "Can I get a late checkout and book dinner for 8 PM?"
                     </div>
-                    <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">
-                        Real-time SLA routing across departments.
-                    </h2>
-                    <p class="text-slate-300 text-base leading-relaxed">
-                        The moment AI formulates a decision, a structured task ticket is created and dispatched directly to staff devices with explicit SLA timers.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 07. REVENUE INTELLIGENCE -->
-        <section id="step-4" class="min-h-screen flex items-center max-w-6xl mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
-                <div class="space-y-6">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-mono">
-                        07. REVENUE INTELLIGENCE
-                    </div>
-                    <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">
-                        Demand signals drive automated yield decisions.
-                    </h2>
-                    <p class="text-slate-300 text-base leading-relaxed">
-                        OtonomiQ continuously monitors flight changes, local events, and booking pace to recommend dynamic rate adjustments.
-                    </p>
-                </div>
-
-                <div class="glass-card p-6 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                        <span class="text-xs font-mono text-emerald-400 font-bold">REVENUE YIELD SIGNAL</span>
-                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono">+14.8% REVPAR LIFT</span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 text-center">
-                        <div class="p-3 rounded-xl bg-slate-900/80 border border-white/5">
-                            <span class="text-[10px] text-slate-400 uppercase font-mono">Occupancy Pace</span>
-                            <div class="text-xl font-bold text-white mt-1">91.4%</div>
-                        </div>
-                        <div class="p-3 rounded-xl bg-slate-900/80 border border-white/5">
-                            <span class="text-[10px] text-slate-400 uppercase font-mono">Recommended BAR</span>
-                            <div class="text-xl font-bold text-emerald-400 mt-1">+$45</div>
-                        </div>
-                    </div>
-
-                    <div class="p-3 rounded-xl bg-slate-900/60 border border-white/5 text-xs text-slate-300 space-y-1 font-mono">
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Signal:</span>
-                            <span class="text-white">Stadium Concert (+35% Search)</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-slate-400">Action:</span>
-                            <span class="text-emerald-400">Apply BAR Rate Adjustment</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 08. PROCUREMENT INTELLIGENCE -->
-        <section id="step-5" class="min-h-screen flex items-center max-w-6xl mx-auto px-4">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
-                <div class="glass-card p-6 rounded-2xl space-y-4">
-                    <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                        <span class="text-xs font-mono text-indigo-400 font-bold">PROCUREMENT RFQ #PO-4402</span>
-                        <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-mono">3 VENDORS EVALUATED</span>
-                    </div>
-
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 text-xs space-y-2">
-                        <div class="flex justify-between text-slate-300">
-                            <span>Item Requirement:</span>
-                            <span class="text-white font-medium">Luxury Egyptian Cotton Linen Sets</span>
-                        </div>
-                        <div class="flex justify-between text-slate-300">
-                            <span>Optimal Vendor:</span>
-                            <span class="text-emerald-400 font-medium">Vendor B (-12% Cost, Next-day Delivery)</span>
-                        </div>
-                    </div>
-
-                    <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-200 flex justify-between items-center">
-                        <span>AI Recommendation: Ready for PO Approval</span>
-                        <button class="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[10px]">Approve PO</button>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-mono">
-                        08. PROCUREMENT INTELLIGENCE
-                    </div>
-                    <h2 class="text-4xl md:text-5xl font-bold text-white tracking-tight">
-                        Requirements transformed into verified purchase orders.
-                    </h2>
-                    <p class="text-slate-300 text-base leading-relaxed">
-                        Inventory drops automatically trigger supplier RFQs, quote comparisons, vendor reliability scoring, and prepared purchase orders.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 11 & 12. OPERATING & OPPORTUNITY LOOPS -->
-        <section id="step-6" class="min-h-screen flex flex-col justify-center max-w-6xl mx-auto px-4 text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border-blue-500/30 text-blue-400 text-xs font-mono mx-auto mb-6">
-                11 & 12. OPERATING & OPPORTUNITY LOOPS
-            </div>
-
-            <h2 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6">
-                The Compounding Intelligence Loop
-            </h2>
-            <p class="text-slate-300 text-lg max-w-2xl mx-auto mb-12">
-                One completed service action creates preference data that powers the next revenue decision.
-            </p>
-
-            <div class="glass-card p-8 rounded-3xl border border-white/10">
-                <div class="grid grid-cols-2 md:grid-cols-6 gap-4 text-center text-xs">
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
-                        <span class="text-blue-400 font-mono text-[10px]">01. SENSE</span>
-                        <div class="text-white font-bold">Guest Request</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
-                        <span class="text-indigo-400 font-mono text-[10px]">02. UNDERSTAND</span>
-                        <div class="text-white font-bold">Context Analysis</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
-                        <span class="text-amber-400 font-mono text-[10px]">03. DECIDE</span>
-                        <div class="text-white font-bold">AI Workflow</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
-                        <span class="text-emerald-400 font-mono text-[10px]">04. ACT</span>
-                        <div class="text-white font-bold">Staff Execution</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
-                        <span class="text-teal-400 font-mono text-[10px]">05. VERIFY</span>
-                        <div class="text-white font-bold">Audit & Approval</div>
-                    </div>
-                    <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-2">
-                        <span class="text-purple-400 font-mono text-[10px]">06. LEARN</span>
-                        <div class="text-white font-bold">Revenue Signal</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 13. CLICKABLE INTERACTIVE COMMAND DASHBOARD FLOW -->
-        <section id="step-7" class="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-4 py-12">
-            <div class="text-center space-y-4 mb-8">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border-blue-500/30 text-blue-400 text-xs font-mono">
-                    13. CLICKABLE DASHBOARD FLOW
-                </div>
-                <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
-                    OtonomiQ Hotel OS Command Center
-                </h2>
-                <p class="text-slate-400 text-sm max-w-2xl mx-auto">
-                    Click the simulated event triggers below to see how intelligence flows live across Guest, Operations, Revenue, and Procurement.
-                </p>
-            </div>
-
-            <!-- DASHBOARD CONTAINER -->
-            <div id="dashboard-flow" class="glass-card p-6 md:p-8 rounded-3xl border border-white/10 space-y-6 shadow-2xl relative">
-                
-                <!-- Dashboard Header Bar -->
-                <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/10">
-                    <div class="flex items-center gap-3">
-                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-amber-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-                        <span class="text-xs font-mono text-slate-300 ml-2">HOTEL OS CONTROL CENTER — GRAND CENTRAL FLAGSHIP</span>
-                    </div>
-                    <div class="flex items-center gap-4 text-xs font-mono text-slate-400">
-                        <span>SYSTEM: <strong class="text-emerald-400">ONLINE</strong></span>
-                        <span>PERMISSIONS: <strong class="text-white">FULL MANAGER CONTROL</strong></span>
-                    </div>
-                </div>
-
-                <!-- Interactive Trigger Buttons Bar -->
-                <div class="p-4 rounded-2xl bg-slate-950/80 border border-white/10 space-y-3">
-                    <div class="text-xs font-mono text-slate-400 uppercase tracking-wider">Simulate Live Hotel Events (Click to Test Flow):</div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                        <button onclick="triggerFlow('guest')" class="p-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-300 font-medium transition-all text-left flex items-center justify-between group">
-                            <span>1. Guest Request</span>
-                            <i data-lucide="message-square" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-                        </button>
-
-                        <button onclick="triggerFlow('revenue')" class="p-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 font-medium transition-all text-left flex items-center justify-between group">
-                            <span>2. Revenue Signal</span>
-                            <i data-lucide="trending-up" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-                        </button>
-
-                        <button onclick="triggerFlow('procurement')" class="p-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-300 font-medium transition-all text-left flex items-center justify-between group">
-                            <span>3. Procurement PO</span>
-                            <i data-lucide="shopping-cart" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-                        </button>
-
-                        <button onclick="triggerFlow('ops')" class="p-3 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/30 text-amber-300 font-medium transition-all text-left flex items-center justify-between group">
-                            <span>4. Staff SLA Task</span>
-                            <i data-lucide="check-square" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Dynamic Live Feed & Metrics -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <!-- Activity Stream Panel -->
-                    <div class="lg:col-span-2 space-y-3">
-                        <div class="flex justify-between items-center text-xs font-mono text-slate-400">
-                            <span>LIVE ACTIVITY STREAM</span>
-                            <span class="text-blue-400" id="activity-counter">4 Events Executed</span>
+                    <div class="ai-processing-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span class="mono" style="font-size: 0.75rem; color: var(--accent-teal);">AI PARSER // STRUCTURED</span>
+                            <span class="badge badge-live"><span class="badge-dot"></span> Context Understood</span>
                         </div>
-
-                        <div id="activity-feed" class="space-y-2 max-h-72 overflow-y-auto pr-2">
-                            <!-- Dynamic items prepended here -->
-                            <div class="p-3 rounded-xl bg-slate-900/80 border border-white/5 flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-3">
-                                    <span class="font-mono text-slate-500">10:42</span>
-                                    <span class="text-white">Suite 402 Guest Request Resolved via AI Concierge</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono text-[10px]">AUTO-RESOLVED</span>
-                            </div>
-
-                            <div class="p-3 rounded-xl bg-slate-900/80 border border-white/5 flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-3">
-                                    <span class="font-mono text-slate-500">10:39</span>
-                                    <span class="text-white">Revenue Rate Engine: Weekend BAR +8% applied</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-mono text-[10px]">OPTIMIZED</span>
-                            </div>
-
-                            <div class="p-3 rounded-xl bg-slate-900/80 border border-white/5 flex items-center justify-between text-xs">
-                                <div class="flex items-center gap-3">
-                                    <span class="font-mono text-slate-500">10:35</span>
-                                    <span class="text-white">Procurement Approval Requested: PO #8802 (Linen Supply)</span>
-                                </div>
-                                <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 font-mono text-[10px]">APPROVAL REQ</span>
-                            </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem;">
+                            <div><strong style="color:var(--text-muted)">Intent 1:</strong> Late Checkout</div>
+                            <div><strong style="color:var(--text-muted)">Intent 2:</strong> F&amp;B Reservation</div>
+                            <div><strong style="color:var(--text-muted)">Context:</strong> 3-Night Stay</div>
+                            <div><strong style="color:var(--text-muted)">History:</strong> VIP Tier 2</div>
                         </div>
                     </div>
-
-                    <!-- Metrics Sidebar -->
-                    <div class="space-y-4">
-                        <div class="text-xs font-mono text-slate-400">MODULE METRICS</div>
-
-                        <div class="p-4 rounded-xl bg-slate-900/80 border border-white/5 space-y-3 text-xs">
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-400">Guest Messages Handled:</span>
-                                <span id="metric-chats" class="font-mono font-bold text-white">142</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-400">Active Task Tickets:</span>
-                                <span id="metric-tasks" class="font-mono font-bold text-amber-400">18</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-400">RevPAR Gain Today:</span>
-                                <span id="metric-revpar" class="font-mono font-bold text-emerald-400">+14.2%</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-400">Autonomous AI Actions:</span>
-                                <span id="metric-actions" class="font-mono font-bold text-blue-400">384</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </section>
-
-        <!-- 18. FINAL APPLE-STYLE CTA -->
-        <section class="max-w-4xl mx-auto px-4 py-20 text-center">
-            <div class="glass-card p-12 rounded-3xl border border-blue-500/30 space-y-6">
-                <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
-                    Ready to experience your Hotel OS?
-                </h2>
-                <p class="text-slate-300 text-base max-w-xl mx-auto leading-relaxed">
-                    Start with an operational challenge. Experience it inside OtonomiQ. See what changes when intelligence can actually move the operation.
-                </p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-                    <a href="mailto:hello@otonomiq.com" class="px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-all shadow-xl shadow-blue-600/30">
-                        Experience OtonomiQ →
-                    </a>
-                    <a href="mailto:team@otonomiq.com" class="px-8 py-4 rounded-xl glass-panel hover:bg-white/5 text-slate-200 font-semibold text-sm transition-all border border-white/10">
-                        Talk to Our Team
-                    </a>
                 </div>
             </div>
         </section>
 
+        <!-- SECTION 03: WORKFLOW TRANSFORMATION -->
+        <section class="story-section container" id="operations">
+            <div style="text-align: center; max-width: 600px; margin: 0 auto 40px;">
+                <div class="eyebrow">02 / WORKFLOW ORCHESTRATION</div>
+                <h2>From decision to staff action.</h2>
+                <p>AI generates recommendations within policy, routing automated tasks directly to operational teams.</p>
+            </div>
+
+            <div class="workflow-nodes">
+                <div class="wf-node active">Guest</div>
+                <div class="wf-node active">AI Concierge</div>
+                <div class="wf-node active">Context Engine</div>
+                <div class="wf-node active">Decision</div>
+                <div class="wf-node">Front Office</div>
+                <div class="wf-node">Restaurant</div>
+                <div class="wf-node">Completion</div>
+            </div>
+
+            <div class="demo-window" style="max-width: 700px; margin: 0 auto;">
+                <div class="task-card">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span class="mono" style="color: var(--accent-teal);">TASK #OT-2841</span>
+                        <span class="badge badge-config"><span class="badge-dot"></span> SLA 08:42</span>
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: 600;">Approve late checkout until 2 PM (Room 1208)</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">Reason: Within property policy. Next check-in is scheduled for 4:30 PM.</div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.8rem;">Approve Recommendation</button>
+                        <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.8rem;">Modify</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 04: REVENUE & PROCUREMENT INTELLIGENCE -->
+        <section class="story-section container" id="revenue">
+            <div class="split-grid">
+                <div class="demo-window">
+                    <div style="margin-bottom: 16px; font-size: 0.85rem; font-weight: 600;">Demand &amp; Pricing Recommendation</div>
+                    <div style="height: 120px; border-bottom: 1px solid var(--border-light); display: flex; align-items: flex-end; gap: 8px; padding-bottom: 10px;">
+                        <div style="height: 40%; width: 14%; background: rgba(255,255,255,0.1); border-radius: 4px;"></div>
+                        <div style="height: 55%; width: 14%; background: rgba(255,255,255,0.1); border-radius: 4px;"></div>
+                        <div style="height: 70%; width: 14%; background: rgba(255,255,255,0.1); border-radius: 4px;"></div>
+                        <div style="height: 90%; width: 14%; background: var(--accent-teal); border-radius: 4px; box-shadow: 0 0 10px var(--accent-teal);"></div>
+                        <div style="height: 60%; width: 14%; background: rgba(255,255,255,0.1); border-radius: 4px;"></div>
+                        <div style="height: 80%; width: 14%; background: rgba(255,255,255,0.1); border-radius: 4px;"></div>
+                    </div>
+                    <div style="margin-top: 16px; font-size: 0.8rem; color: var(--text-secondary);">
+                        <strong>AI Signal:</strong> Demand pattern detected for upcoming weekend. Recommend +8% ADR adjustment.
+                    </div>
+                </div>
+
+                <div class="story-content">
+                    <div class="eyebrow">03 / REVENUE &amp; PROCUREMENT</div>
+                    <h2>Intelligence beyond the inbox.</h2>
+                    <p>AI continuous monitoring identifies dynamic yield opportunities and optimizes operational procurement quotes without human delay.</p>
+                    <div style="display: flex; gap: 12px;">
+                        <span class="badge badge-live"><span class="badge-dot"></span> Revenue Engine</span>
+                        <span class="badge badge-config"><span class="badge-dot"></span> Vendor Comparison</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 05: AI WORKFORCE -->
+        <section class="story-section container" id="workforce">
+            <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+                <div class="eyebrow">04 / AUTONOMOUS WORKFORCE</div>
+                <h2>An AI workforce for hotel operations.</h2>
+                <p>Specialized autonomous agents operating synchronously under your strict management oversight.</p>
+            </div>
+
+            <div class="agents-grid">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <span style="font-weight: 600;">Guest Agent</span>
+                        <span class="badge badge-live"><span class="badge-dot"></span> Active</span>
+                    </div>
+                    <div class="agent-stats">
+                        <div>12 Conversations Active</div>
+                        <div>8 Tasks Dispatched</div>
+                        <div>2 Escalations</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <span style="font-weight: 600;">Revenue Agent</span>
+                        <span class="badge badge-live"><span class="badge-dot"></span> Active</span>
+                    </div>
+                    <div class="agent-stats">
+                        <div>3 Recommendations Ready</div>
+                        <div>1 Approval Required</div>
+                        <div>+4.2% Yield Uplift</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <span style="font-weight: 600;">Operations Agent</span>
+                        <span class="badge badge-live"><span class="badge-dot"></span> Active</span>
+                    </div>
+                    <div class="agent-stats">
+                        <div>18 Tasks Tracked</div>
+                        <div>4 SLA Alerts</div>
+                        <div>Zero Unassigned</div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <span style="font-weight: 600;">Procurement Agent</span>
+                        <span class="badge badge-config"><span class="badge-dot"></span> Standby</span>
+                    </div>
+                    <div class="agent-stats">
+                        <div>6 Vendor Comparisons</div>
+                        <div>2 Quotes Pending</div>
+                        <div>$1,240 Savings Found</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 06: OPERATING LOOP -->
+        <section class="story-section container">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <div class="eyebrow">05 / SYSTEM ARCHITECTURE</div>
+                <h2>The Continuous Operating Loop</h2>
+            </div>
+
+            <div class="loop-sequence">
+                <div class="loop-step">
+                    <div class="step-word">01 SENSE</div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Capture guest signals, IoT data, and system events continuously.</div>
+                </div>
+                <div class="loop-step">
+                    <div class="step-word">02 UNDERSTAND</div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Parse context, guest profile, property rules, and live availability.</div>
+                </div>
+                <div class="loop-step">
+                    <div class="step-word">03 DECIDE</div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Generate optimal operational recommendation with complete policy logic.</div>
+                </div>
+                <div class="loop-step">
+                    <div class="step-word">04 ACT</div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Route structured tasks straight to human staff or automated workflows.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 07: INTERACTIVE COMMAND CENTER MODULE TRANSFORMER -->
+        <section class="story-section container command-center" id="command-center">
+            <div class="eyebrow">06 / COMMAND CENTER</div>
+            <h2>Built around how your hotel operates.</h2>
+            <p style="color: var(--text-secondary);">Select a operational layer to transform the Hotel OS interface.</p>
+
+            <div class="module-nav">
+                <button class="module-btn active" onclick="switchModule('guest', this)">Guest Intelligence</button>
+                <button class="module-btn" onclick="switchModule('operations', this)">Operations Command</button>
+                <button class="module-btn" onclick="switchModule('revenue', this)">Revenue Engine</button>
+                <button class="module-btn" onclick="switchModule('procurement', this)">Procurement</button>
+            </div>
+
+            <div class="cmd-viewport" id="cmd-viewport">
+                <!-- Dynamic Content Rendered Here -->
+            </div>
+        </section>
+
+        <!-- FINAL CTA -->
+        <section class="cta-section container" id="cta">
+            <div class="eyebrow">GET STARTED</div>
+            <h2>Ready to experience your Hotel OS?</h2>
+            <p>Start with an operational challenge. Experience it inside OtonomiQ. See what changes when intelligence can actually move the operation.</p>
+            <div style="display: flex; gap: 16px; justify-content: center;">
+                <a href="#" class="btn btn-primary">Experience OtonomiQ →</a>
+                <a href="#" class="btn btn-secondary">Talk to Our Team</a>
+            </div>
+        </section>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="border-t border-white/5 py-8 text-center text-xs text-slate-500 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>© 2026 OtonomiQ Inc. The Operating System for Hospitality.</div>
-            <div class="flex items-center gap-6 text-slate-400">
-                <span>Privacy</span>
-                <span>Security Overview</span>
-                <span>Terms</span>
-            </div>
+    <footer>
+        <div class="container">
+            © 2026 OtonomiQ Systems Inc. All rights reserved. OtonomiQ Hotel OS is enterprise hotel operating software.
         </div>
     </footer>
 
-    <!-- THREE.JS 3D SCENE & INTERACTIVE LOGIC -->
+    <!-- --------------------------------------------------
+     * INTERACTIVE SCRIPTING (VANILLA JS)
+     * -------------------------------------------------- -->
     <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
+        /* Canvas Network Animation */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
 
-        // Step coordinates for 3D camera flight targets
-        const cameraSteps = [
-            { x: 0, y: 0, z: 8, rx: 0, ry: 0 },         // 0: Hero
-            { x: 0, y: -5, z: 6, rx: 0.1, ry: -0.2 },   // 1: Modules
-            { x: -3, y: -10, z: 5, rx: 0.2, ry: -0.3 }, // 2: Guest AI
-            { x: 3, y: -15, z: 6, rx: -0.1, ry: 0.3 },  // 3: Operations
-            { x: -2, y: -20, z: 5, rx: 0.2, ry: -0.2 }, // 4: Revenue
-            { x: 2, y: -25, z: 5, rx: -0.2, ry: 0.2 },  // 5: Procurement
-            { x: 0, y: -30, z: 7, rx: 0, ry: 0 },       // 6: Loop
-            { x: 0, y: -35, z: 8, rx: 0, ry: 0 }        // 7: Command Center
-        ];
-
-        let currentStepIndex = 0;
-
-        // THREE.JS WEBGL SETUP
-        const canvas = document.getElementById('webgl-canvas');
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x030712, 0.05);
-
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(cameraSteps[0].x, cameraSteps[0].y, cameraSteps[0].z);
-
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // Create 3D Nodes representing Hotel OS Modules
-        const nodeGeometries = [
-            new THREE.IcosahedronGeometry(1.2, 1),
-            new THREE.TorusKnotGeometry(0.8, 0.25, 100, 16),
-            new THREE.OctahedronGeometry(1.3, 0),
-            new THREE.DodecahedronGeometry(1.1, 0),
-            new THREE.SphereGeometry(1.2, 16, 16)
-        ];
-
-        const nodeMaterials = [
-            new THREE.MeshStandardMaterial({ color: 0x3b82f6, wireframe: true }),
-            new THREE.MeshStandardMaterial({ color: 0xf59e0b, wireframe: true }),
-            new THREE.MeshStandardMaterial({ color: 0x10b981, wireframe: true }),
-            new THREE.MeshStandardMaterial({ color: 0x6366f1, wireframe: true }),
-            new THREE.MeshStandardMaterial({ color: 0x38bdf8, wireframe: true })
-        ];
-
-        const objects = [];
-        const stepYPositions = [0, -5, -10, -15, -20, -25, -30, -35];
-
-        stepYPositions.forEach((yPos, idx) => {
-            const geo = nodeGeometries[idx % nodeGeometries.length];
-            const mat = nodeMaterials[idx % nodeMaterials.length];
-            const mesh = new THREE.Mesh(geo, mat);
-
-            const xPos = (idx % 2 === 0) ? 2.5 : -2.5;
-            mesh.position.set(xPos, yPos, (Math.random() - 0.5) * 2);
-            scene.add(mesh);
-            objects.push(mesh);
-        });
-
-        // Ambient Particle Field
-        const particleCount = 600;
-        const particleGeo = new THREE.BufferGeometry();
-        const particleCoords = new Float32Array(particleCount * 3);
-
-        for (let i = 0; i < particleCount * 3; i += 3) {
-            particleCoords[i] = (Math.random() - 0.5) * 30;
-            particleCoords[i + 1] = (Math.random() - 0.5) * 60 - 10;
-            particleCoords[i + 2] = (Math.random() - 0.5) * 20;
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(particleCoords, 3));
-        const particleMat = new THREE.PointsMaterial({
-            size: 0.04,
-            color: 0x60a5fa,
-            transparent: true,
-            opacity: 0.6
-        });
-        const particles = new THREE.Points(particleGeo, particleMat);
-        scene.add(particles);
+        const particles = Array.from({ length: 40 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            radius: Math.random() * 1.5 + 1
+        }));
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
-        scene.add(ambientLight);
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00E5FF';
+            ctx.strokeStyle = 'rgba(0, 229, 255, 0.05)';
 
-        const pointLight = new THREE.PointLight(0x3b82f6, 3, 25);
-        pointLight.position.set(5, 5, 5);
-        scene.add(pointLight);
+            particles.forEach((p, i) => {
+                p.x += p.vx;
+                p.y += p.vy;
 
-        // Mouse Inertia Parallax
-        let mouseX = 0, mouseY = 0;
-        let targetMouseX = 0, targetMouseY = 0;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
 
-        window.addEventListener('mousemove', (e) => {
-            targetMouseX = (e.clientX / window.innerWidth - 0.5) * 0.8;
-            targetMouseY = (e.clientY / window.innerHeight - 0.5) * 0.8;
-        });
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
 
-        // Navigation Controller
-        function navigateToStep(stepIdx) {
-            currentStepIndex = stepIdx;
-            
-            document.querySelectorAll('.step-nav-btn').forEach((btn, idx) => {
-                if (idx === stepIdx) {
-                    btn.classList.add('bg-blue-600', 'text-white');
-                    btn.classList.remove('text-slate-400');
-                } else {
-                    btn.classList.remove('bg-blue-600', 'text-white');
-                    btn.classList.add('text-slate-400');
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
                 }
             });
-
-            const targetSection = document.getElementById(`step-${stepIdx}`);
-            if (targetSection) {
-                targetSection.scrollIntoView({ behavior: 'smooth' });
-            }
+            requestAnimationFrame(drawParticles);
         }
+        drawParticles();
 
-        // Scroll Observer
+        /* Interactive Scroll Transformations */
         window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
-            const windowHeight = window.innerHeight;
-            const calculatedStep = Math.min(
-                Math.floor((scrollY + windowHeight * 0.35) / windowHeight),
-                cameraSteps.length - 1
-            );
-
-            if (calculatedStep !== currentStepIndex && calculatedStep >= 0) {
-                currentStepIndex = calculatedStep;
-                document.querySelectorAll('.step-nav-btn').forEach((btn, idx) => {
-                    if (idx === currentStepIndex) {
-                        btn.classList.add('bg-blue-600', 'text-white');
-                        btn.classList.remove('text-slate-400');
-                    } else {
-                        btn.classList.remove('bg-blue-600', 'text-white');
-                        btn.classList.add('text-slate-400');
-                    }
-                });
+            const dash = document.getElementById('hero-dash');
+            const scrolled = window.scrollY;
+            if (scrolled < 600) {
+                const rotateVal = Math.max(0, 4 - scrolled / 100);
+                dash.style.transform = `rotateX(${rotateVal}deg) scale(${1 + scrolled / 3000})`;
             }
         });
 
-        // Clickable Dashboard Flow Simulation Engine
-        let totalEventsExecuted = 4;
-        let chatsCount = 142;
-        let tasksCount = 18;
-        let actionsCount = 384;
-
-        function triggerFlow(type) {
-            totalEventsExecuted++;
-            document.getElementById('activity-counter').innerText = `${totalEventsExecuted} Events Executed`;
-
-            const feed = document.getElementById('activity-feed');
-            const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
-
-            let newEntry = '';
-
-            if (type === 'guest') {
-                chatsCount += 1;
-                actionsCount += 1;
-                document.getElementById('metric-chats').innerText = chatsCount;
-                document.getElementById('metric-actions').innerText = actionsCount;
-
-                newEntry = `
-                    <div class="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-between text-xs animate-pulse">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-blue-400">${timeStr}</span>
-                            <span class="text-white font-medium">Guest Request: Room 305 requested extra pillows & late checkout</span>
-                        </div>
-                        <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono text-[10px]">AI PARSED</span>
+        /* Command Center Module Transformer */
+        const moduleViews = {
+            guest: `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>Guest Intelligence Workspace</h3>
+                    <span class="badge badge-live"><span class="badge-dot"></span> 42 Active Guests Syncing</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--border-light);">
+                        <strong style="color: var(--accent-teal);">Active Conversation Analysis</strong>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px;">Room 1208 requested late checkout. Intent matched with housekeeping SLA schedule.</p>
                     </div>
-                `;
-            } else if (type === 'revenue') {
-                actionsCount += 2;
-                document.getElementById('metric-revpar').innerText = '+16.1%';
-                document.getElementById('metric-actions').innerText = actionsCount;
-
-                newEntry = `
-                    <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs animate-pulse">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-emerald-400">${timeStr}</span>
-                            <span class="text-white font-medium">Revenue Optimization: BAR Rate updated to $410 (+9% Lift)</span>
-                        </div>
-                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">RATE SYNCED</span>
+                    <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--border-light);">
+                        <strong style="color: var(--accent-emerald);">Automated Action</strong>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px;">Pre-approved late checkout dispatched to guest application directly.</p>
                     </div>
-                `;
-            } else if (type === 'procurement') {
-                actionsCount += 1;
-                document.getElementById('metric-actions').innerText = actionsCount;
+                </div>
+            `,
+            operations: `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>Operations Command Center</h3>
+                    <span class="badge badge-config"><span class="badge-dot"></span> 18 Active Tasks</span>
+                </div>
+                <table class="dash-table">
+                    <thead>
+                        <tr><th>Task ID</th><th>Department</th><th>Priority</th><th>SLA Remaining</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>#OT-2841</td><td>Front Office</td><td>High</td><td>08:42</td></tr>
+                        <tr><td>#OT-2842</td><td>Housekeeping</td><td>Medium</td><td>22:15</td></tr>
+                        <tr><td>#OT-2843</td><td>Engineering</td><td>Normal</td><td>45:00</td></tr>
+                    </tbody>
+                </table>
+            `,
+            revenue: `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>Revenue Intelligence Dashboard</h3>
+                    <span class="badge badge-live"><span class="badge-dot"></span> Yield Engine Active</span>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                    <div class="metric-card"><div class="title">Projected Occupancy</div><div class="value">92%</div></div>
+                    <div class="metric-card"><div class="title">Current RevPAR</div><div class="value">$248</div></div>
+                    <div class="metric-card"><div class="title">AI Yield Index</div><div class="value" style="color: var(--accent-teal);">+12.4%</div></div>
+                </div>
+            `,
+            procurement: `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>Procurement &amp; Supply Engine</h3>
+                    <span class="badge badge-roadmap"><span class="badge-dot"></span> 2 Approvals Pending</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid var(--border-light);">
+                    <div><strong>Linens RFQ Optimization</strong></div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px;">Supplier A recommended based on historical reliability index (99.2%) and delivery timeline.</div>
+                </div>
+            `
+        };
 
-                newEntry = `
-                    <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-between text-xs animate-pulse">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-indigo-400">${timeStr}</span>
-                            <span class="text-white font-medium">Procurement Engine: Auto-RFQ generated for Spa Amenities</span>
-                        </div>
-                        <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono text-[10px]">PO SENT</span>
-                    </div>
-                `;
-            } else if (type === 'ops') {
-                tasksCount += 1;
-                actionsCount += 1;
-                document.getElementById('metric-tasks').innerText = tasksCount;
-                document.getElementById('metric-actions').innerText = actionsCount;
-
-                newEntry = `
-                    <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs animate-pulse">
-                        <div class="flex items-center gap-3">
-                            <span class="font-mono text-amber-400">${timeStr}</span>
-                            <span class="text-white font-medium">SLA Dispatch: Housekeeping Task #TK-${Math.floor(1000 + Math.random() * 9000)} routed to Staff #4</span>
-                        </div>
-                        <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono text-[10px]">DISPATCHED</span>
-                    </div>
-                `;
-            }
-
-            feed.insertAdjacentHTML('afterbegin', newEntry);
-
-            // Rotate 3D Object faster momentarily on interaction
-            if (objects[currentStepIndex]) {
-                objects[currentStepIndex].rotation.y += 1.5;
-            }
+        function switchModule(moduleKey, btn) {
+            document.querySelectorAll('.module-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const viewport = document.getElementById('cmd-viewport');
+            viewport.style.opacity = 0;
+            setTimeout(() => {
+                viewport.innerHTML = moduleViews[moduleKey];
+                viewport.style.opacity = 1;
+            }, 200);
         }
 
-        // Render Loop
-        const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
-
-            objects.forEach((obj, idx) => {
-                obj.rotation.x = elapsedTime * 0.3 * (idx % 2 === 0 ? 1 : -1);
-                obj.rotation.y = elapsedTime * 0.4;
-            });
-
-            mouseX += (targetMouseX - mouseX) * 0.05;
-            mouseY += (targetMouseY - mouseY) * 0.05;
-
-            const targetCam = cameraSteps[currentStepIndex];
-
-            camera.position.x += (targetCam.x + mouseX - camera.position.x) * 0.04;
-            camera.position.y += (targetCam.y - mouseY - camera.position.y) * 0.04;
-            camera.position.z += (targetCam.z - camera.position.z) * 0.04;
-
-            camera.rotation.x += (targetCam.rx - camera.rotation.x) * 0.04;
-            camera.rotation.y += (targetCam.ry - camera.rotation.y) * 0.04;
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
-
-        // Responsive Resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        // Initialize Command Center with Guest view
+        document.getElementById('cmd-viewport').innerHTML = moduleViews['guest'];
     </script>
 </body>
 </html>
