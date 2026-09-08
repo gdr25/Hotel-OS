@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OtonomiQ Hotel OS — Intelligence That Moves The Hotel</title>
+    <title>OtonomiQ Hotel OS — Interactive Product Sandbox</title>
     
     <!-- Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +20,7 @@
             --bg-graphite: #1C1F24;
             --surface-card: #16181D;
             --surface-border: rgba(255, 255, 255, 0.08);
-            --surface-border-active: rgba(0, 229, 255, 0.3);
+            --surface-border-active: rgba(0, 229, 255, 0.4);
             
             --text-primary: #F5F6F8;
             --text-secondary: #8E95A2;
@@ -31,6 +31,7 @@
             --accent-blue: #2979FF;
             --accent-green: #00E676;
             --accent-warning: #FFAB00;
+            --accent-red: #FF1744;
 
             --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -57,20 +58,20 @@
         }
 
         /* Typography Helpers */
-        h1, h2, h3 {
+        h1, h2, h3, h4 {
             font-weight: 600;
             letter-spacing: -0.03em;
-            line-height: 1.05;
+            line-height: 1.1;
         }
 
         .huge-title {
-            font-size: clamp(3rem, 7vw, 6.5rem);
+            font-size: clamp(2.5rem, 6vw, 5.5rem);
             color: var(--text-primary);
             margin-bottom: 1.5rem;
         }
 
         .subline {
-            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            font-size: clamp(1rem, 2vw, 1.35rem);
             color: var(--text-secondary);
             font-weight: 400;
             max-width: 600px;
@@ -90,7 +91,7 @@
         /* Layout Structure */
         section {
             min-height: 100vh;
-            padding: 8rem 2rem 4rem;
+            padding: 7rem 2rem 4rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -104,44 +105,67 @@
             margin: 0 auto;
         }
 
-        /* Buttons & UI Components */
+        /* Interactive Elements */
+        button, .clickable-pill, .ui-nav-item, .agent-card {
+            cursor: pointer;
+            user-select: none;
+        }
+
         .btn-primary {
             background: var(--text-primary);
             color: var(--bg-obsidian);
-            padding: 0.9rem 1.8rem;
+            padding: 0.8rem 1.6rem;
             border-radius: 99px;
-            font-weight: 500;
-            font-size: 0.95rem;
+            font-weight: 600;
+            font-size: 0.9rem;
             text-decoration: none;
-            transition: all 0.3s var(--ease-out);
+            transition: all 0.2s var(--ease-out);
+            border: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            border: none;
-            cursor: pointer;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
-            padding: 0.9rem 1.8rem;
+            padding: 0.8rem 1.6rem;
             border-radius: 99px;
             font-weight: 500;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             text-decoration: none;
             border: 1px solid var(--surface-border);
-            transition: all 0.3s var(--ease-out);
-            cursor: pointer;
+            transition: all 0.2s var(--ease-out);
         }
 
         .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-accent {
+            background: rgba(0, 229, 255, 0.12);
+            color: var(--accent-teal);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-accent:hover {
+            background: rgba(0, 229, 255, 0.25);
+            box-shadow: 0 0 15px var(--accent-teal-glow);
         }
 
         .badge {
@@ -150,21 +174,55 @@
             border-radius: 4px;
             font-weight: 600;
             letter-spacing: 0.05em;
+            display: inline-block;
         }
         .badge-live { background: rgba(0, 230, 118, 0.15); color: var(--accent-green); border: 1px solid rgba(0, 230, 118, 0.3); }
         .badge-config { background: rgba(0, 229, 255, 0.15); color: var(--accent-teal); border: 1px solid rgba(0, 229, 255, 0.3); }
+        .badge-warning { background: rgba(255, 171, 0, 0.15); color: var(--accent-warning); border: 1px solid rgba(255, 171, 0, 0.3); }
+
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--bg-charcoal);
+            border: 1px solid var(--accent-teal);
+            color: var(--text-primary);
+            padding: 0.9rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px var(--accent-teal-glow);
+            transform: translateX(120%);
+            transition: transform 0.3s var(--ease-out);
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
 
         /* ==========================================================================
            02. HEADER / NAVIGATION
            ========================================================================== */
         header {
             position: fixed;
-            top: 1.5rem;
+            top: 1.25rem;
             left: 50%;
             transform: translateX(-50%);
             width: min(90%, 1100px);
             z-index: 1000;
-            background: rgba(18, 20, 23, 0.75);
+            background: rgba(18, 20, 23, 0.8);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--surface-border);
@@ -173,7 +231,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: all 0.3s ease;
         }
 
         .nav-logo {
@@ -204,7 +261,6 @@
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.875rem;
-            font-weight: 400;
             transition: color 0.2s ease;
         }
 
@@ -213,44 +269,36 @@
         }
 
         /* ==========================================================================
-           03. CHAPTER 01 — HERO & PRODUCT REVEAL
+           03. HERO & LIVE INTERACTIVE DASHBOARD
            ========================================================================== */
         .hero {
-            padding-top: 12rem;
+            padding-top: 10rem;
             text-align: center;
             justify-content: flex-start;
         }
 
         .product-hero-frame {
-            margin-top: 4rem;
+            margin-top: 3.5rem;
             width: 100%;
-            max-width: 1100px;
-            height: 600px;
+            max-width: 1150px;
+            height: 620px;
             background: var(--surface-card);
             border: 1px solid var(--surface-border);
             border-radius: 16px;
             box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), 0 0 80px rgba(0, 229, 255, 0.05);
             overflow: hidden;
             position: relative;
-            transform: scale(0.92) translateY(50px);
-            opacity: 0.8;
-            transition: transform 0.8s var(--ease-out), opacity 0.8s ease, border-color 0.5s ease;
+            text-align: left;
+            transition: border-color 0.3s ease;
         }
 
-        .product-hero-frame.in-view {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        /* Dashboard UI Component Mock (OtonomiQ OS Interface) */
         .ui-mock-header {
             height: 48px;
             background: var(--bg-charcoal);
             border-bottom: 1px solid var(--surface-border);
             display: flex;
             align-items: center;
-            padding: 0 1rem;
+            padding: 0 1.25rem;
             justify-content: space-between;
         }
 
@@ -259,7 +307,7 @@
 
         .ui-mock-body {
             display: grid;
-            grid-template-columns: 220px 1fr 300px;
+            grid-template-columns: 220px 1fr 310px;
             height: calc(100% - 48px);
             background: var(--bg-obsidian);
         }
@@ -270,33 +318,40 @@
             padding: 1.25rem;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 0.75rem;
         }
 
         .ui-nav-item {
-            height: 32px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.03);
+            height: 36px;
+            border-radius: 8px;
+            background: transparent;
             display: flex;
             align-items: center;
-            padding: 0 0.75rem;
-            font-size: 0.8rem;
+            padding: 0 0.85rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
-            gap: 0.5rem;
+            gap: 0.6rem;
+            transition: all 0.2s ease;
+        }
+
+        .ui-nav-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
         }
 
         .ui-nav-item.active {
             background: rgba(0, 229, 255, 0.1);
             color: var(--accent-teal);
-            border: 1px solid rgba(0, 229, 255, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            font-weight: 500;
         }
 
         .ui-main-stage {
             padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            overflow: hidden;
+            gap: 1.25rem;
+            overflow-y: auto;
             position: relative;
         }
 
@@ -309,56 +364,112 @@
         .ui-card {
             background: var(--surface-card);
             border: 1px solid var(--surface-border);
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.35rem;
+            transition: all 0.3s ease;
+        }
+
+        .ui-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .tab-panel {
+            display: none;
+            flex-direction: column;
+            gap: 1.25rem;
+            height: 100%;
+        }
+
+        .tab-panel.active {
+            display: flex;
         }
 
         .ui-right-panel {
             background: var(--bg-charcoal);
             border-left: 1px solid var(--surface-border);
             padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            overflow-y: auto;
+            max-height: 480px;
+        }
+
+        .feed-card {
+            background: var(--surface-card);
+            border: 1px solid var(--surface-border);
+            padding: 0.75rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ==========================================================================
-           04. CHAPTER 02 — GUEST INTENT TO ACTION (TRANSFORMATION SEQUENCE)
+           04. GUEST EXPERIENCE DEMO
            ========================================================================== */
-        .section-statement {
-            text-align: center;
-            min-height: 60vh;
-        }
-
         .interactive-chat-container {
             width: 100%;
-            max-width: 800px;
-            margin-top: 3rem;
+            max-width: 850px;
+            margin-top: 2.5rem;
             background: var(--surface-card);
             border: 1px solid var(--surface-border);
             border-radius: 16px;
             padding: 2rem;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transition: all 0.5s var(--ease-out);
+            text-align: left;
+        }
+
+        .prompt-triggers {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .prompt-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--surface-border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .prompt-btn:hover {
+            border-color: var(--accent-teal);
+            color: var(--text-primary);
+            background: rgba(0, 229, 255, 0.05);
         }
 
         .chat-bubble-guest {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.06);
             border: 1px solid var(--surface-border);
             padding: 1.25rem 1.5rem;
             border-radius: 16px 16px 16px 2px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: var(--text-primary);
-            max-width: 80%;
-            margin-bottom: 2rem;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.5s var(--ease-out);
-        }
-
-        .chat-bubble-guest.show {
-            transform: translateY(0);
-            opacity: 1;
+            margin-bottom: 1.5rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
         }
 
         .ai-processing-card {
@@ -369,14 +480,7 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            opacity: 0;
-            transform: scale(0.95);
-            transition: all 0.5s var(--ease-out);
-        }
-
-        .ai-processing-card.active {
-            opacity: 1;
-            transform: scale(1);
+            transition: all 0.3s ease;
         }
 
         .context-pills {
@@ -395,7 +499,7 @@
         }
 
         /* ==========================================================================
-           05. CHAPTER 03 — HORIZONTAL WORKFLOW ANIMATION
+           05. HORIZONTAL WORKFLOW STEPPER
            ========================================================================== */
         .workflow-sequence {
             display: flex;
@@ -403,17 +507,15 @@
             justify-content: space-between;
             width: 100%;
             gap: 1rem;
-            margin-top: 4rem;
-            overflow-x: auto;
-            padding: 2rem 0;
+            margin-top: 3rem;
         }
 
         .workflow-step {
             background: var(--surface-card);
             border: 1px solid var(--surface-border);
             border-radius: 12px;
-            padding: 1.5rem;
-            min-width: 180px;
+            padding: 1.25rem 1rem;
+            min-width: 170px;
             text-align: center;
             position: relative;
             transition: all 0.3s ease;
@@ -422,6 +524,7 @@
         .workflow-step.active {
             border-color: var(--accent-teal);
             box-shadow: 0 0 20px var(--accent-teal-glow);
+            background: var(--bg-charcoal);
         }
 
         .workflow-connector {
@@ -435,61 +538,11 @@
             position: absolute;
             top: 0; left: 0; height: 100%; width: 0%;
             background: var(--accent-teal);
-            transition: width 0.5s ease;
+            transition: width 0.4s ease;
         }
 
         /* ==========================================================================
-           06. CHAPTER 04 — INTELLIGENCE EXPANSION (REVENUE & PROCUREMENT)
-           ========================================================================== */
-        .grid-two-col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            width: 100%;
-            margin-top: 4rem;
-        }
-
-        .feature-display-card {
-            background: var(--surface-card);
-            border: 1px solid var(--surface-border);
-            border-radius: 16px;
-            padding: 2.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 400px;
-            transition: border-color 0.3s ease;
-        }
-
-        .feature-display-card:hover {
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Graph SVG Mock */
-        .graph-svg {
-            width: 100%;
-            height: 120px;
-            margin-top: 2rem;
-        }
-
-        /* Procurement Table */
-        .procure-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1.5rem;
-            font-size: 0.85rem;
-        }
-
-        .procure-table th, .procure-table td {
-            padding: 0.75rem 0.5rem;
-            text-align: left;
-            border-bottom: 1px solid var(--surface-border);
-        }
-
-        .procure-table th { color: var(--text-muted); font-weight: 500; }
-
-        /* ==========================================================================
-           07. CHAPTER 05 — AI WORKFORCE & HUMAN CONTROL
+           06. AI WORKFORCE & CARDS
            ========================================================================== */
         .agent-grid {
             display: grid;
@@ -505,15 +558,15 @@
             border-radius: 12px;
             padding: 1.75rem;
             transition: all 0.3s var(--ease-out);
-            cursor: pointer;
             position: relative;
             overflow: hidden;
         }
 
-        .agent-card:hover {
-            transform: translateY(-5px);
+        .agent-card:hover, .agent-card.selected {
+            transform: translateY(-4px);
             border-color: var(--accent-teal);
             background: var(--bg-charcoal);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .agent-status {
@@ -536,103 +589,42 @@
             100% { opacity: 0.4; }
         }
 
-        /* ==========================================================================
-           08. CHAPTER 06 — OPERATING LOOP & MODULE EXPANSION
-           ========================================================================== */
-        .loop-container {
-            display: flex;
-            justify-content: space-around;
+        .grid-two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
             width: 100%;
-            margin-top: 4rem;
-            border-top: 1px solid var(--surface-border);
-            border-bottom: 1px solid var(--surface-border);
-            padding: 2.5rem 0;
-        }
-
-        .loop-node {
-            text-align: center;
-        }
-
-        .loop-node-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .loop-node-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        /* ==========================================================================
-           09. CHAPTER 08 — HOTEL OS COMMAND CENTER REVEAL
-           ========================================================================== */
-        .command-center-frame {
-            width: 100%;
-            background: var(--bg-charcoal);
-            border: 1px solid var(--surface-border-active);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 0 100px rgba(0, 229, 255, 0.1);
             margin-top: 3rem;
         }
 
-        .activity-feed {
+        .feature-display-card {
+            background: var(--surface-card);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 2.25rem;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-        }
-
-        .feed-item {
-            display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 0.9rem 1.25rem;
-            background: var(--surface-card);
-            border-radius: 8px;
-            border: 1px solid var(--surface-border);
-            font-size: 0.875rem;
-        }
-
-        /* ==========================================================================
-           10. FOOTER & CTA
-           ========================================================================== */
-        .final-cta {
-            text-align: center;
-            min-height: 80vh;
-        }
-
-        footer {
-            border-top: 1px solid var(--surface-border);
-            padding: 4rem 2rem 2rem;
-            background: var(--bg-obsidian);
-            width: 100%;
-        }
-
-        .footer-content {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            min-height: 380px;
+            text-align: left;
         }
 
         /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .huge-title { font-size: 2.5rem; }
+        @media (max-width: 900px) {
+            .huge-title { font-size: 2.2rem; }
             .grid-two-col { grid-template-columns: 1fr; }
             .ui-mock-body { grid-template-columns: 1fr; }
             .ui-sidebar, .ui-right-panel { display: none; }
             .nav-links { display: none; }
-            .loop-container { flex-direction: column; gap: 1.5rem; }
-            .workflow-sequence { flex-direction: column; align-items: stretch; }
-            .workflow-connector { width: 2px; height: 30px; margin: 0 auto; }
+            .workflow-sequence { flex-direction: column; gap: 0.75rem; }
+            .workflow-connector { width: 2px; height: 20px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container"></div>
 
     <!-- HEADER / NAVIGATION -->
     <header>
@@ -641,28 +633,24 @@
             OtonomiQ
         </div>
         <ul class="nav-links">
-            <li><a href="#hero">Hotel OS</a></li>
-            <li><a href="#guest">Experience</a></li>
-            <li><a href="#revenue">Platform</a></li>
+            <li><a href="#hero">Sandbox</a></li>
+            <li><a href="#guest">Guest Intent</a></li>
+            <li><a href="#workflow">Workflow</a></li>
             <li><a href="#workforce">AI Workforce</a></li>
         </ul>
-        <a href="#cta" class="btn-primary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem;">Experience OtonomiQ →</a>
+        <button class="btn-primary" style="padding: 0.5rem 1.1rem; font-size: 0.85rem;" onclick="triggerGlobalSim()">Simulate Live Request ⚡</button>
     </header>
 
     <main>
 
-        <!-- CHAPTER 01: HERO & PRODUCT REVEAL -->
+        <!-- CHAPTER 01: HERO & LIVE INTERACTIVE DASHBOARD -->
         <section class="hero" id="hero">
-            <span class="label-tag">OTONOMIQ HOTEL OS</span>
+            <span class="label-tag">INTERACTIVE PRODUCT DEMO</span>
             <h1 class="huge-title">Intelligence<br>that moves<br>the hotel.</h1>
-            <p class="subline">One operating layer connecting guests, teams, workflows and AI.</p>
-            
-            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-                <a href="#cta" class="btn-primary">Experience Hotel OS →</a>
-            </div>
+            <p class="subline">Click any tab, option, or button below to experience the real-time operational engine.</p>
 
             <!-- Massive Product Hero Display -->
-            <div class="product-hero-frame" id="hero-frame">
+            <div class="product-hero-frame">
                 <div class="ui-mock-header">
                     <div class="ui-dots">
                         <div class="ui-dot"></div>
@@ -670,421 +658,517 @@
                         <div class="ui-dot"></div>
                     </div>
                     <span style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">OTONOMIQ OS v4.2 — COMMAND CENTER</span>
-                    <span class="badge badge-live">LIVE SYSTEM</span>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span class="badge badge-live" id="system-status-badge">SYSTEM ACTIVE</span>
+                        <button class="btn-accent" style="padding: 0.25rem 0.6rem; font-size: 0.7rem;" onclick="toggleSystemState()">Pause Engine</button>
+                    </div>
                 </div>
+
                 <div class="ui-mock-body">
+                    <!-- Dashboard Sidebar Navigation -->
                     <div class="ui-sidebar">
-                        <div class="ui-nav-item active">Overview</div>
-                        <div class="ui-nav-item">Guest Operations</div>
-                        <div class="ui-nav-item">Revenue Optimization</div>
-                        <div class="ui-nav-item">Procurement</div>
-                        <div class="ui-nav-item">AI Agents (5)</div>
+                        <div class="ui-nav-item active" onclick="switchTab('overview', this)">
+                            <span>⚡</span> Overview
+                        </div>
+                        <div class="ui-nav-item" onclick="switchTab('guest-ops', this)">
+                            <span>🛎️</span> Guest Ops <span class="badge badge-config" style="margin-left:auto;" id="nav-count-guest">3</span>
+                        </div>
+                        <div class="ui-nav-item" onclick="switchTab('revenue-tab', this)">
+                            <span>📈</span> Revenue AI
+                        </div>
+                        <div class="ui-nav-item" onclick="switchTab('procurement-tab', this)">
+                            <span>📦</span> Procurement
+                        </div>
+                        <div style="margin-top: auto; border-top: 1px solid var(--surface-border); padding-top: 0.75rem;">
+                            <span style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">AI AGENT MODE</span>
+                            <button class="btn-secondary" style="width: 100%; padding: 0.4rem; font-size: 0.75rem;" onclick="toggleAutopilot(this)">Autopilot: ON</button>
+                        </div>
                     </div>
+
+                    <!-- Main Operational Stage -->
                     <div class="ui-main-stage">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <span style="font-size: 0.9rem; font-weight: 600;">System Velocity</span>
-                            <span style="font-size: 0.75rem; color: var(--accent-teal);">Automated Workflows: 94.2%</span>
-                        </div>
-                        <div class="ui-card-grid">
-                            <div class="ui-card">
-                                <span style="font-size: 0.7rem; color: var(--text-muted);">ACTIVE REQUESTS</span>
-                                <span style="font-size: 1.5rem; font-weight: 600;">18</span>
+                        
+                        <!-- TAB 1: OVERVIEW -->
+                        <div class="tab-panel active" id="tab-overview">
+                            <div class="ui-card-grid">
+                                <div class="ui-card">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">ACTIVE REQUESTS</span>
+                                    <span style="font-size: 1.6rem; font-weight: 600;" id="metric-active-requests">18</span>
+                                    <span style="font-size: 0.7rem; color: var(--accent-green);">↑ Real-time synced</span>
+                                </div>
+                                <div class="ui-card">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">AVG RESPONSE SLA</span>
+                                    <span style="font-size: 1.6rem; font-weight: 600; color: var(--accent-green);" id="metric-sla">1m 12s</span>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">Goal: &lt;2m 00s</span>
+                                </div>
+                                <div class="ui-card">
+                                    <span style="font-size: 0.7rem; color: var(--text-muted);">REVENUE OPTIMIZED</span>
+                                    <span style="font-size: 1.6rem; font-weight: 600; color: var(--accent-teal);" id="metric-revenue">+$4,290</span>
+                                    <span style="font-size: 0.7rem; color: var(--accent-teal);">Auto-yield active</span>
+                                </div>
                             </div>
-                            <div class="ui-card">
-                                <span style="font-size: 0.7rem; color: var(--text-muted);">AVG RESPONSE SLA</span>
-                                <span style="font-size: 1.5rem; font-weight: 600; color: var(--accent-green);">1m 12s</span>
-                            </div>
-                            <div class="ui-card">
-                                <span style="font-size: 0.7rem; color: var(--text-muted);">REVENUE OPTIMIZED</span>
-                                <span style="font-size: 1.5rem; font-weight: 600;">+$4,290</span>
+
+                            <div style="background: var(--surface-card); border: 1px solid var(--surface-border); border-radius: 10px; padding: 1.25rem; flex-grow: 1;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <span style="font-size: 0.85rem; font-weight: 600;">PENDING DECISIONS (HUMAN-IN-THE-LOOP)</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);">Requires Staff Sign-off</span>
+                                </div>
+                                
+                                <div id="approval-queue-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                    <div class="feed-card" id="approval-item-1" style="flex-direction: row; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="display: block;">VIP Upgrade Request — Suite 402</strong>
+                                            <span style="color: var(--text-muted); font-size: 0.75rem;">Guest: Sarah Jenkins (Tier 1 Gold) • Cost: $0 (Complimentary)</span>
+                                        </div>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <button class="btn-accent" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="approveItem('approval-item-1', 'VIP Upgrade Approved for Sarah Jenkins')">Approve</button>
+                                            <button class="btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="rejectItem('approval-item-1')">Decline</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="ui-card" style="flex-grow: 1; margin-top: 0.5rem; justify-content: center; align-items: center; border-style: dashed;">
-                            <span style="font-size: 0.85rem; color: var(--text-secondary);">Real-Time Intelligence Visualizer Active</span>
+
+                        <!-- TAB 2: GUEST OPERATIONS -->
+                        <div class="tab-panel" id="tab-guest-ops">
+                            <h4 style="font-size: 1rem;">Live Guest Conversations & Tasks</h4>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-accent" onclick="addSimulatedGuestRequest()">+ Simulate Incoming Guest Message</button>
+                            </div>
+                            <div id="guest-ops-list" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem;">
+                                <div class="feed-card">
+                                    <span style="color: var(--accent-teal); font-weight: 600;">Room 1208 — Late Checkout Request</span>
+                                    <span>AI Resolution: Approved late checkout until 2:00 PM. Housekeeping notified.</span>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- TAB 3: REVENUE -->
+                        <div class="tab-panel" id="tab-revenue-tab">
+                            <h4 style="font-size: 1rem;">Dynamic Yield Management</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary);">High local demand detected (+22% concert weekend). Recommend rate adjustment.</p>
+                            <div style="background: var(--surface-card); border: 1px solid var(--surface-border); padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong>Adjust Deluxe King ADR to $385/night (+14%)</strong>
+                                    <span style="display: block; font-size: 0.75rem; color: var(--text-muted);">Estimated Revenue Surge: +$1,850 tonight</span>
+                                </div>
+                                <button class="btn-primary" style="font-size: 0.8rem;" onclick="applyYieldOptimization(this)">Apply Rate Surge</button>
+                            </div>
+                        </div>
+
+                        <!-- TAB 4: PROCUREMENT -->
+                        <div class="tab-panel" id="tab-procurement-tab">
+                            <h4 style="font-size: 1rem;">Automated Inventory & RFQs</h4>
+                            <div class="feed-card">
+                                <strong>Minibar Restock Threshold Reached</strong>
+                                <span style="color: var(--text-secondary);">AI matched Vendor A ($4,200, 2-day lead time).</span>
+                                <button class="btn-accent" style="margin-top: 0.5rem; width: max-content;" onclick="dispatchPurchaseOrder(this)">Dispatch Purchase Order</button>
+                            </div>
+                        </div>
+
                     </div>
+
+                    <!-- Live Stream Panel -->
                     <div class="ui-right-panel">
-                        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">LIVE AGENT STREAM</span>
-                        <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
-                            <div style="font-size: 0.75rem; color: var(--text-secondary); border-left: 2px solid var(--accent-teal); padding-left: 0.5rem;">
-                                Guest #1208 requested Late Checkout. Processing...
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">LIVE AGENT STREAM</span>
+                            <span style="width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%;"></span>
+                        </div>
+                        
+                        <div class="feed-container" id="live-stream-feed">
+                            <div class="feed-card">
+                                <span style="font-size: 0.7rem; color: var(--text-muted);">10:42 AM — Guest Agent</span>
+                                <span>Late Checkout processed for Room 1208.</span>
                             </div>
-                            <div style="font-size: 0.75rem; color: var(--text-secondary); border-left: 2px solid var(--accent-green); padding-left: 0.5rem;">
-                                Dinner reservation slotted for 8:00 PM.
+                            <div class="feed-card">
+                                <span style="font-size: 0.7rem; color: var(--text-muted);">10:39 AM — Revenue Agent</span>
+                                <span>Yield model updated for weekend.</span>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </section>
 
 
-        <!-- CHAPTER 02: GUEST EXPERIENCE & AI UNDERSTANDING -->
+        <!-- CHAPTER 02: GUEST INTENT DEMO -->
         <section class="section-statement" id="guest">
-            <span class="label-tag">01 — GUEST EXPERIENCE</span>
-            <h2 class="huge-title" style="font-size: clamp(2.5rem, 5vw, 4.5rem);">One guest request.<br>A lot can happen next.</h2>
+            <span class="label-tag">01 — GUEST EXPERIENCE DEMO</span>
+            <h2 class="huge-title" style="font-size: clamp(2rem, 4vw, 3.5rem); text-align: center;">Try a guest scenario:</h2>
             
             <div class="interactive-chat-container">
-                <div class="chat-bubble-guest" id="chat-bubble">
-                    “Can I get a late checkout and book dinner for 8 PM?”
+                <div class="prompt-triggers">
+                    <button class="prompt-btn" onclick="runGuestScenario('late_checkout')">Scenario A: "Late checkout & dinner table for 8 PM"</button>
+                    <button class="prompt-btn" onclick="runGuestScenario('towels')">Scenario B: "Need 4 extra towels & extra coffee pods"</button>
+                    <button class="prompt-btn" onclick="runGuestScenario('ac_issue')">Scenario C: "AC isn't cooling properly in Room 504"</button>
                 </div>
 
-                <div class="ai-processing-card" id="ai-card">
+                <div class="chat-bubble-guest" id="chat-bubble-text">
+                    Select a scenario above to test how OtonomiQ processes guest intent...
+                </div>
+
+                <div class="ai-processing-card" id="ai-scenario-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.8rem; font-weight: 600; color: var(--accent-teal);">AI CONTEXT UNDERSTANDING</span>
-                        <span class="badge badge-config">PROCESSING</span>
+                        <span style="font-size: 0.8rem; font-weight: 600; color: var(--accent-teal);" id="scenario-status-label">AWAITING INTENT</span>
+                        <span class="badge badge-config" id="scenario-badge">STANDBY</span>
                     </div>
-                    <div class="context-pills">
-                        <div class="pill">Guest: <strong>Alex Morgan</strong></div>
-                        <div class="pill">Room: <strong>1208</strong></div>
-                        <div class="pill">Status: <strong>VIP Tier 1</strong></div>
-                        <div class="pill">Policy: <strong>Late Checkout Eligible (2 PM)</strong></div>
-                        <div class="pill">Restaurant: <strong>8:00 PM Available</strong></div>
+                    
+                    <div class="context-pills" id="scenario-pills">
+                        <div class="pill">Guest: —</div>
+                        <div class="pill">Room: —</div>
+                        <div class="pill">Policy: —</div>
                     </div>
-                    <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+
+                    <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); padding: 1rem; border-radius: 8px;">
                         <span style="font-size: 0.75rem; color: var(--accent-teal); display: block; margin-bottom: 0.25rem; font-weight: 600;">RECOMMENDED ACTION</span>
-                        <p style="font-size: 0.9rem; color: var(--text-primary);">Approve late checkout until 2:00 PM. Reserve table for 2 at Fine Dining at 8:00 PM.</p>
+                        <p style="font-size: 0.9rem; color: var(--text-primary);" id="scenario-action-text">No active request selected.</p>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;" id="scenario-controls">
+                        <button class="btn-accent" onclick="executeScenarioAction()" id="scenario-exec-btn" disabled>Execute Action</button>
                     </div>
                 </div>
             </div>
         </section>
 
 
-        <!-- CHAPTER 03: WORKFLOW & ACTION -->
+        <!-- CHAPTER 03: WORKFLOW AUTOMATION -->
         <section id="workflow">
             <span class="label-tag">02 — AUTOMATED WORKFLOW</span>
-            <h2 class="huge-title" style="font-size: clamp(2.5rem, 5vw, 4.5rem); text-align: center;">Understanding is only<br>the beginning.</h2>
-            <p class="subline" style="text-align: center;">Transforming guest intent into coordinated operational execution.</p>
+            <h2 class="huge-title" style="font-size: clamp(2rem, 4vw, 3.5rem); text-align: center;">Click to advance workflow:</h2>
 
             <div class="container">
                 <div class="workflow-sequence">
-                    <div class="workflow-step active" id="wf-1">
+                    <div class="workflow-step active" id="wf-step-1">
                         <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">STEP 01</span>
-                        <strong style="font-size: 0.9rem;">Guest Request</strong>
+                        <strong style="font-size: 0.85rem;">Request Captured</strong>
                     </div>
                     <div class="workflow-connector"><div class="workflow-connector-line" id="wf-line-1"></div></div>
                     
-                    <div class="workflow-step" id="wf-2">
+                    <div class="workflow-step" id="wf-step-2">
                         <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">STEP 02</span>
-                        <strong style="font-size: 0.9rem;">AI Decision</strong>
+                        <strong style="font-size: 0.85rem;">AI Policy Check</strong>
                     </div>
                     <div class="workflow-connector"><div class="workflow-connector-line" id="wf-line-2"></div></div>
 
-                    <div class="workflow-step" id="wf-3">
+                    <div class="workflow-step" id="wf-step-3">
                         <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">STEP 03</span>
-                        <strong style="font-size: 0.9rem;">Front Office Task</strong>
+                        <strong style="font-size: 0.85rem;">Task Dispatched</strong>
                     </div>
                     <div class="workflow-connector"><div class="workflow-connector-line" id="wf-line-3"></div></div>
 
-                    <div class="workflow-step" id="wf-4">
+                    <div class="workflow-step" id="wf-step-4">
                         <span style="font-size: 0.7rem; color: var(--text-muted); display: block;">STEP 04</span>
-                        <strong style="font-size: 0.9rem;">Completion</strong>
+                        <strong style="font-size: 0.85rem;">Guest Notified</strong>
                     </div>
                 </div>
 
-                <div style="background: var(--surface-card); border: 1px solid var(--surface-border); padding: 1.5rem; border-radius: 12px; margin-top: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.5rem;">
-                        <span style="color: var(--text-muted);">TASK #OT-2841</span>
-                        <span style="color: var(--accent-green); font-weight: 600;">STATUS: IN PROGRESS</span>
-                    </div>
-                    <p style="font-size: 0.95rem; font-weight: 500;">Front Desk + Housekeeping SLA updated to 14:00 extended stay.</p>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn-primary" onclick="advanceWorkflowStep()">Advance Workflow Step ➔</button>
+                    <button class="btn-secondary" onclick="resetWorkflowStep()" style="margin-left: 0.5rem;">Reset</button>
                 </div>
             </div>
         </section>
 
 
-        <!-- CHAPTER 04: REVENUE & PROCUREMENT INTELLIGENCE -->
-        <section id="revenue">
-            <span class="label-tag">03 — EXPANDED INTELLIGENCE</span>
-            <h2 class="huge-title" style="font-size: clamp(2.5rem, 5vw, 4.5rem); text-align: center;">And the hotel sees more.</h2>
-
-            <div class="container">
-                <div class="grid-two-col">
-                    
-                    <!-- Card 1: Revenue -->
-                    <div class="feature-display-card">
-                        <div>
-                            <span class="badge badge-live">REVENUE INTELLIGENCE</span>
-                            <h3 style="font-size: 1.5rem; margin-top: 1rem;">Demand Dynamic Rate Adjust</h3>
-                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                Unlocks hidden yield by continuously matching room availability with local demand spikes.
-                            </p>
-                        </div>
-                        
-                        <!-- Mini SVG Chart -->
-                        <svg class="graph-svg" viewBox="0 0 300 100">
-                            <path d="M 0 80 Q 75 70, 150 40 T 300 10" fill="none" stroke="var(--accent-teal)" stroke-width="3"/>
-                            <path d="M 0 80 Q 75 70, 150 40 T 300 10 L 300 100 L 0 100 Z" fill="url(#teal-glow)" opacity="0.2"/>
-                            <defs>
-                                <linearGradient id="teal-glow" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stop-color="var(--accent-teal)"/>
-                                    <stop offset="100%" stop-color="transparent"/>
-                                </linearGradient>
-                            </defs>
-                        </svg>
-
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--surface-border); padding-top: 1rem;">
-                            <span style="font-size: 0.8rem; color: var(--text-muted);">AI Recommendation: ADR +14%</span>
-                            <button class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Approve</button>
-                        </div>
-                    </div>
-
-                    <!-- Card 2: Procurement -->
-                    <div class="feature-display-card">
-                        <div>
-                            <span class="badge badge-config">PROCUREMENT</span>
-                            <h3 style="font-size: 1.5rem; margin-top: 1rem;">From Requirement to Decision</h3>
-                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                Automated vendor quote comparisons and stock level optimization.
-                            </p>
-                        </div>
-
-                        <table class="procure-table">
-                            <thead>
-                                <tr>
-                                    <th>Supplier</th>
-                                    <th>Quote</th>
-                                    <th>Delivery</th>
-                                    <th>Match</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Vendor A</td>
-                                    <td>$4,200</td>
-                                    <td>2 Days</td>
-                                    <td style="color: var(--accent-green);">98%</td>
-                                </tr>
-                                <tr>
-                                    <td>Vendor B</td>
-                                    <td>$4,600</td>
-                                    <td>1 Day</td>
-                                    <td style="color: var(--text-muted);">82%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--surface-border); padding-top: 1rem;">
-                            <span style="font-size: 0.8rem; color: var(--text-muted);">RFQ Auto-generated</span>
-                            <button class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Review</button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-
-        <!-- CHAPTER 05: AI WORKFORCE & HUMAN CONTROL -->
+        <!-- CHAPTER 05: AI WORKFORCE CARDS -->
         <section id="workforce">
-            <span class="label-tag">04 — INTELLIGENCE WORKFORCE</span>
-            <h2 class="huge-title" style="font-size: clamp(2.5rem, 5vw, 4.5rem); text-align: center;">Intelligence, working<br>across the hotel.</h2>
-            
+            <span class="label-tag">03 — AI AGENT WORKFORCE</span>
+            <h2 class="huge-title" style="font-size: clamp(2rem, 4vw, 3.5rem); text-align: center;">Select an AI Agent</h2>
+
             <div class="container">
                 <div class="agent-grid">
                     
-                    <div class="agent-card">
+                    <div class="agent-card" onclick="selectAgentCard(this, 'Guest Intelligence Agent activated. Processing guest conversations across WhatsApp, Web App, and Voice.')">
                         <span style="font-size: 0.75rem; color: var(--text-muted);">AGENT 01</span>
                         <h4 style="font-size: 1.2rem; margin-top: 0.25rem;">Guest Intelligence</h4>
                         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">Handles multi-channel guest requests, personalization, and instant query resolution.</p>
-                        <div class="agent-status"><div class="status-dot"></div> Active — Processing 12 requests</div>
+                        <div class="agent-status"><div class="status-dot"></div> Click to focus agent</div>
                     </div>
 
-                    <div class="agent-card">
+                    <div class="agent-card" onclick="selectAgentCard(this, 'Revenue Intelligence Agent activated. Adjusting occupancy curves and competitive rate parity.')">
                         <span style="font-size: 0.75rem; color: var(--text-muted);">AGENT 02</span>
                         <h4 style="font-size: 1.2rem; margin-top: 0.25rem;">Revenue Intelligence</h4>
                         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">Monitors market signals, competitor pricing, and demand curves in real-time.</p>
-                        <div class="agent-status"><div class="status-dot"></div> Active — Optimizing Yield</div>
+                        <div class="agent-status"><div class="status-dot"></div> Click to focus agent</div>
                     </div>
 
-                    <div class="agent-card">
+                    <div class="agent-card" onclick="selectAgentCard(this, 'Operations Agent activated. Monitoring housekeeping SLAs and room turnaround times.')">
                         <span style="font-size: 0.75rem; color: var(--text-muted);">AGENT 03</span>
                         <h4 style="font-size: 1.2rem; margin-top: 0.25rem;">Operations Agent</h4>
                         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">Schedules staff workflows, tracks SLAs, and dispatches team assignments.</p>
-                        <div class="agent-status"><div class="status-dot"></div> Active — 100% SLA Met</div>
+                        <div class="agent-status"><div class="status-dot"></div> Click to focus agent</div>
                     </div>
 
                 </div>
-
-                <!-- Human + AI Control Moment -->
-                <div style="margin-top: 4rem; text-align: center; background: var(--surface-card); border: 1px solid var(--surface-border); padding: 3rem; border-radius: 16px;">
-                    <h3 style="font-size: 2rem; margin-bottom: 1rem;">AI recommends. People decide.</h3>
-                    <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 2rem;">Full operational transparency with built-in audit trails and human approval checkpoints.</p>
-                    <div style="display: flex; gap: 1rem; justify-content: center;">
-                        <button class="btn-primary">Approve Action</button>
-                        <button class="btn-secondary">Modify Parameter</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- CHAPTER 06: OPERATING LOOP -->
-        <section>
-            <span class="label-tag">05 — THE OPERATING LOOP</span>
-            <h2 class="huge-title" style="font-size: clamp(2rem, 4vw, 3.5rem); text-align: center;">Continuous Operational Motion</h2>
-
-            <div class="container">
-                <div class="loop-container">
-                    <div class="loop-node">
-                        <div class="loop-node-title">SENSE</div>
-                        <div class="loop-node-desc">Capture signals</div>
-                    </div>
-                    <div class="loop-node">
-                        <div class="loop-node-title">UNDERSTAND</div>
-                        <div class="loop-node-desc">Analyze context</div>
-                    </div>
-                    <div class="loop-node">
-                        <div class="loop-node-title">DECIDE</div>
-                        <div class="loop-node-desc">Generate options</div>
-                    </div>
-                    <div class="loop-node">
-                        <div class="loop-node-title">ACT</div>
-                        <div class="loop-node-desc">Execute workflow</div>
-                    </div>
-                    <div class="loop-node">
-                        <div class="loop-node-title">LEARN</div>
-                        <div class="loop-node-desc">Refine system</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- CHAPTER 08: COMPLETE COMMAND CENTER REVEAL -->
-        <section>
-            <span class="label-tag">06 — COMPLETE OS</span>
-            <h2 class="huge-title" style="font-size: clamp(2.5rem, 5vw, 4.5rem); text-align: center;">The Hotel OS Command Center</h2>
-
-            <div class="container">
-                <div class="command-center-frame">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--surface-border); padding-bottom: 1rem;">
-                        <div>
-                            <h3 style="font-size: 1.2rem;">OtonomiQ Unified Platform</h3>
-                            <span style="font-size: 0.8rem; color: var(--text-muted);">Property: Grand Horizon Resort & Spa</span>
-                        </div>
-                        <span class="badge badge-live">SYSTEM SYNCED</span>
-                    </div>
-
-                    <div class="activity-feed">
-                        <div class="feed-item">
-                            <span><strong>10:42 AM</strong> — Guest Late Checkout Request Resolved</span>
-                            <span class="badge badge-live">Front Desk</span>
-                        </div>
-                        <div class="feed-item">
-                            <span><strong>10:39 AM</strong> — Revenue Recommendation: Rate Increase +$25</span>
-                            <span class="badge badge-config">Revenue</span>
-                        </div>
-                        <div class="feed-item">
-                            <span><strong>10:35 AM</strong> — Inventory Auto-PO Dispatched to Supplier B</span>
-                            <span class="badge badge-live">Procurement</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- CHAPTER 10: FINAL REVEAL & CTA -->
-        <section class="final-cta" id="cta">
-            <span class="label-tag">GET STARTED</span>
-            <h2 class="huge-title" style="font-size: clamp(3rem, 6vw, 5.5rem);">Ready to experience<br>your Hotel OS?</h2>
-            <p class="subline" style="text-align: center; margin-bottom: 2.5rem;">
-                Start with an operational challenge. Experience it inside OtonomiQ. See what changes when intelligence can actually move the operation.
-            </p>
-
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-                <a href="#" class="btn-primary" style="padding: 1.1rem 2.2rem; font-size: 1rem;">Experience OtonomiQ →</a>
-                <a href="#" class="btn-secondary" style="padding: 1.1rem 2.2rem; font-size: 1rem;">Talk to Our Team</a>
             </div>
         </section>
 
     </main>
 
     <!-- FOOTER -->
-    <footer>
-        <div class="footer-content">
-            <div class="nav-logo">
-                <div class="nav-logo-dot"></div>
-                OtonomiQ Hotel OS
-            </div>
-            <p style="font-size: 0.8rem; color: var(--text-muted);">
-                &copy; 2026 OtonomiQ Technologies Inc. One operating layer for the modern hotel.
-            </p>
+    <footer style="border-top: 1px solid var(--surface-border); padding: 3rem 2rem; background: var(--bg-obsidian); text-align: center;">
+        <div class="nav-logo" style="justify-content: center; margin-bottom: 0.75rem;">
+            <div class="nav-logo-dot"></div>
+            OtonomiQ Hotel OS
         </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+            &copy; 2026 OtonomiQ Technologies Inc. Interactive Product Experience.
+        </p>
     </footer>
 
 
     <!-- ==========================================================================
-       VANILLA JAVASCRIPT: SCROLL INTERACTION & INTERACTIVE UI LOGIC
+       VANILLA JAVASCRIPT: DASHBOARD ACTIONS & INTERACTIVE LOGIC
        ========================================================================== -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        // State Management
+        let currentWorkflowStage = 1;
+        let isSystemActive = true;
+        let activeRequestsCount = 18;
+        let activeScenario = null;
 
-            // 1. Hero Product Scale Scroll Effect
-            const heroFrame = document.getElementById('hero-frame');
+        // Toast Notification Utility
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<span>⚡</span> <span>${message}</span>`;
             
-            const observerOptions = {
-                root: null,
-                threshold: 0.2
-            };
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
 
-            const heroObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        heroFrame.classList.add('in-view');
-                    }
-                });
-            }, observerOptions);
+        // Add item to Dashboard Stream
+        function appendToStream(title, detail) {
+            const stream = document.getElementById('live-stream-feed');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-            heroObserver.observe(heroFrame);
+            const card = document.createElement('div');
+            card.className = 'feed-card';
+            card.innerHTML = `
+                <span style="font-size: 0.7rem; color: var(--accent-teal);">${timeStr} — ${title}</span>
+                <span>${detail}</span>
+            `;
 
+            stream.prepend(card);
+        }
 
-            // 2. Interactive Guest Request & AI Reveal Sequence
-            const chatBubble = document.getElementById('chat-bubble');
-            const aiCard = document.getElementById('ai-card');
+        // 1. Navigation Tab Switcher
+        function switchTab(tabId, el) {
+            // Update active sidebar nav
+            document.querySelectorAll('.ui-sidebar .ui-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            el.classList.add('active');
 
-            const guestObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            chatBubble.classList.add('show');
-                        }, 200);
+            // Switch Tab Panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabId}`).classList.add('active');
 
-                        setTimeout(() => {
-                            aiCard.classList.add('active');
-                        }, 800);
-                    }
-                });
-            }, { threshold: 0.4 });
+            showToast(`Switched view to: ${el.innerText.trim()}`);
+        }
 
-            guestObserver.observe(document.getElementById('guest'));
+        // 2. Pause/Resume System Engine Toggle
+        function toggleSystemState() {
+            isSystemActive = !isSystemActive;
+            const badge = document.getElementById('system-status-badge');
+            
+            if (isSystemActive) {
+                badge.className = 'badge badge-live';
+                badge.innerText = 'SYSTEM ACTIVE';
+                showToast('OtonomiQ AI Engine Resumed');
+            } else {
+                badge.className = 'badge badge-warning';
+                badge.innerText = 'PAUSED';
+                showToast('OtonomiQ AI Engine Paused');
+            }
+        }
 
+        // 3. Toggle Autopilot Mode
+        function toggleAutopilot(btn) {
+            if (btn.innerText.includes('ON')) {
+                btn.innerText = 'Autopilot: ASSIST';
+                showToast('AI set to Assist Mode (Requires Staff Approval)');
+            } else {
+                btn.innerText = 'Autopilot: ON';
+                showToast('AI set to Full Autopilot Mode');
+            }
+        }
 
-            // 3. Horizontal Workflow Animated Sequence
-            const wf1 = document.getElementById('wf-1');
-            const wf2 = document.getElementById('wf-2');
-            const wf3 = document.getElementById('wf-3');
-            const wf4 = document.getElementById('wf-4');
+        // 4. Decision Queue Approval
+        function approveItem(itemId, msg) {
+            const item = document.getElementById(itemId);
+            if (item) {
+                item.style.opacity = '0.5';
+                item.innerHTML = `<span style="color: var(--accent-green); font-weight: 600;">✓ ${msg}</span>`;
+                setTimeout(() => item.remove(), 1200);
+            }
+            
+            // Increment metrics
+            activeRequestsCount++;
+            document.getElementById('metric-active-requests').innerText = activeRequestsCount;
+            
+            showToast(`Approved: ${msg}`);
+            appendToStream('Human Decision', msg);
+        }
 
-            const line1 = document.getElementById('wf-line-1');
-            const line2 = document.getElementById('wf-line-2');
-            const line3 = document.getElementById('wf-line-3');
+        function rejectItem(itemId) {
+            const item = document.getElementById(itemId);
+            if (item) {
+                item.style.opacity = '0.5';
+                item.innerHTML = `<span style="color: var(--accent-red); font-weight: 600;">✗ Request Declined</span>`;
+                setTimeout(() => item.remove(), 1200);
+            }
+            showToast('Request declined by staff.');
+            appendToStream('Human Decision', 'Request declined.');
+        }
 
-            const workflowObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // Sequential activation of workflow nodes
-                        setTimeout(() => { line1.style.width = '100%'; wf2.classList.add('active'); }, 400);
-                        setTimeout(() => { line2.style.width = '100%'; wf3.classList.add('active'); }, 900);
-                        setTimeout(() => { line3.style.width = '100%'; wf4.classList.add('active'); }, 1400);
-                    }
-                });
-            }, { threshold: 0.5 });
+        // 5. Global Simulation Trigger
+        function triggerGlobalSim() {
+            const guestNames = ['Elena Rostova', 'Marcus Vance', 'David Kim', 'Sophia Chen'];
+            const requests = ['Requested Extra Room Key', 'Booked Spa Treatment at 4 PM', 'Ordered Airport Transfer', 'Inquired about Breakfast Hours'];
+            
+            const randomGuest = guestNames[Math.floor(Math.random() * guestNames.length)];
+            const randomReq = requests[Math.floor(Math.random() * requests.length)];
 
-            workflowObserver.observe(document.getElementById('workflow'));
+            activeRequestsCount++;
+            document.getElementById('metric-active-requests').innerText = activeRequestsCount;
 
-        });
+            showToast(`New Guest Event: ${randomGuest} — ${randomReq}`);
+            appendToStream('Guest Request', `${randomGuest}: ${randomReq}`);
+
+            // Add to Guest Ops List
+            const opsList = document.getElementById('guest-ops-list');
+            const card = document.createElement('div');
+            card.className = 'feed-card';
+            card.innerHTML = `
+                <span style="color: var(--accent-teal); font-weight: 600;">${randomGuest}</span>
+                <span>Request: ${randomReq} (Auto-Processed)</span>
+            `;
+            opsList.prepend(card);
+        }
+
+        function addSimulatedGuestRequest() {
+            triggerGlobalSim();
+        }
+
+        // 6. Yield Surge Button
+        function applyYieldOptimization(btn) {
+            btn.disabled = true;
+            btn.innerText = 'Rate Applied ✓';
+            btn.style.background = 'var(--accent-green)';
+            btn.style.color = '#000';
+            
+            document.getElementById('metric-revenue').innerText = '+$6,140';
+            showToast('ADR surge applied: +14% across Deluxe category');
+            appendToStream('Revenue Agent', 'Rates updated: +$1,850 yield projected.');
+        }
+
+        // 7. Dispatch PO Button
+        function dispatchPurchaseOrder(btn) {
+            btn.disabled = true;
+            btn.innerText = 'PO #8821 Dispatched ✓';
+            showToast('Purchase order #8821 sent to Vendor A');
+            appendToStream('Procurement Agent', 'PO #8821 sent to Vendor A');
+        }
+
+        // 8. Scenario Switcher (Guest Experience Section)
+        const scenarios = {
+            late_checkout: {
+                text: '“Can I get a late checkout and book dinner for 8 PM?”',
+                pills: ['Guest: Alex Morgan (Room 1208)', 'Tier: VIP Gold', 'Late Checkout: Eligible', 'Dining: 8 PM Available'],
+                action: 'Approve late checkout until 2:00 PM & reserve Fine Dining for 2 guests at 8:00 PM.'
+            },
+            towels: {
+                text: '“Could we get 4 extra fresh towels and extra coffee pods sent up?”',
+                pills: ['Guest: Marcus Vance (Room 405)', 'Housekeeping SLA: 8 Mins', 'Stock: Available'],
+                action: 'Dispatch automated task to Housekeeping Floor 4 (High Priority).'
+            },
+            ac_issue: {
+                text: '“The AC unit in Room 504 is making a strange noise and not cooling.”',
+                pills: ['Guest: Elena Rostova (Room 504)', 'Maintenance SLA: Urgent', 'Room Move: Option Available'],
+                action: 'Create High-Priority Engineering Ticket #ENG-102. Notify duty technician immediately.'
+            }
+        };
+
+        function runGuestScenario(key) {
+            activeScenario = scenarios[key];
+            
+            document.getElementById('chat-bubble-text').innerText = activeScenario.text;
+            document.getElementById('scenario-status-label').innerText = 'INTENT UNDERSTOOD';
+            document.getElementById('scenario-badge').className = 'badge badge-live';
+            document.getElementById('scenario-badge').innerText = 'PARSED';
+
+            const pillsContainer = document.getElementById('scenario-pills');
+            pillsContainer.innerHTML = '';
+            activeScenario.pills.forEach(p => {
+                const pillDiv = document.createElement('div');
+                pillDiv.className = 'pill';
+                pillDiv.innerText = p;
+                pillsContainer.appendChild(pillDiv);
+            });
+
+            document.getElementById('scenario-action-text').innerText = activeScenario.action;
+            
+            const execBtn = document.getElementById('scenario-exec-btn');
+            execBtn.disabled = false;
+            execBtn.innerText = 'Execute Action';
+
+            showToast('AI analyzed guest intent and checked hotel policy');
+        }
+
+        function executeScenarioAction() {
+            if (!activeScenario) return;
+
+            const execBtn = document.getElementById('scenario-exec-btn');
+            execBtn.innerText = 'Action Executed ✓';
+            execBtn.disabled = true;
+
+            showToast('Operational Task Dispatched to Hotel Staff');
+            appendToStream('Automated Task', activeScenario.action);
+        }
+
+        // 9. Workflow Step Controller
+        function advanceWorkflowStep() {
+            if (currentWorkflowStage < 4) {
+                currentWorkflowStage++;
+                
+                document.getElementById(`wf-step-${currentWorkflowStage}`).classList.add('active');
+                document.getElementById(`wf-line-${currentWorkflowStage - 1}`).style.width = '100%';
+
+                showToast(`Workflow advanced to Step 0${currentWorkflowStage}`);
+            } else {
+                showToast('Workflow completed!');
+            }
+        }
+
+        function resetWorkflowStep() {
+            currentWorkflowStage = 1;
+            for (let i = 2; i <= 4; i++) {
+                document.getElementById(`wf-step-${i}`).classList.remove('active');
+                document.getElementById(`wf-line-${i - 1}`).style.width = '0%';
+            }
+            showToast('Workflow reset to Step 01');
+        }
+
+        // 10. AI Agent Card Focus
+        function selectAgentCard(card, message) {
+            document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            showToast(message);
+        }
     </script>
 </body>
 </html>
